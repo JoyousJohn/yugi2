@@ -1,0 +1,82 @@
+:root {
+    --card-width: 110px;
+    --card-height: calc(var(--card-width) * 1.45)
+}
+
+#viewport {
+    display: flex;
+    justify-content: center;
+    height: 95vh;
+}
+
+#info-panel {
+    position: fixed;
+    display: none;
+    background-color: gray;
+    font: 1.5rem A-Space Demo;
+    white-space: nowrap;
+    z-index: 1;
+    left: 0;
+}
+
+#mat {
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transform: perspective(1500px) rotateX(15deg) scaleY(1);
+    transform-origin: center center;
+}
+
+
+#field-grid-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.field-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 15px;
+}
+
+.card-zone, .card-zone > img {
+    width: var(--card-width);
+    height: var(--card-height);
+    border: 2px solid red;
+}
+
+.field-zone { background-color: yellow; }
+.main-zone { background-color: lime; ;}
+
+#row-wrapper {
+    /*display: flex;*/
+    display: grid;
+    grid-template-columns: auto minmax(0, auto) auto;
+    justify-content: space-between;
+}
+
+#player-hand, #opponent-hand {
+    display: flex;
+    justify-content: center;
+    /*width: 80%;*/
+}
+
+#player-hand > div, #opponent-hand > div {
+    width: var(--card-width);
+    /*margin: auto 15px;*/
+    flex: 1 0 0;
+    overflow-x: hidden;
+}
+
+.card-img {
+    max-width: var(--card-width);
+}
+
+.selected-card {
+    border: 5px solid blue;
+}
+
+button {
+    font: 2rem Arial;
+}

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Yu-Gi-Oh! Ripoff</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="selection.css">
+    <link rel="stylesheet" href="game.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="cards.js"></script> 
+    <script defer src="game.js"></script> 
+    <script defer src="deck.js"></script> 
+    <script defer src="phases.js"></script> 
+    <link href="https://fonts.cdnfonts.com/css/a-space-demo" rel="stylesheet">
+</head>
+
+<body style="margin: 0;">
+
+    <div id="homescreen">
+
+        <h1 style="font: 4rem Arial;">yugi-2</h1>
+
+        <button onclick="startGame();">START GAME</button>
+        <button onclick="buildDecks();">DECK BUILDER</button>
+
+        <!--<script>
+            if (localStorage.getItem('deck') === null) $('#homescreen').append('<p>Your deck is empty, using default deck!')
+        </script>-->
+
+    </div>
+
+    <div id="deck-builder" style="display: none;">
+
+        <div id="deck-builder-info">
+
+            <button onclick="doneSelecting();">DONE</button>
+            <button onclick="clearDeck();">RESET DECK</button>
+            <p id="card-count"></p>
+
+        </div>
+    
+        <div style="display: grid; grid-template-columns: 1fr 1fr; height: 100vh;">
+        
+            <div id="player-deck">
+
+            </div>
+
+            <div id="deck-selector">
+    
+            </div>
+        
+        </div>
+    
+    </div>
+    
+    <div id="viewport" style="display: none;">
+
+        <div id="turn-popup" style="display: none;"><span></span></div>
+
+        <div id="info-panel">
+
+            <div id="info-stats">
+
+                <p id="game-phase"></p>
+
+                <p id="turn-info"></p>
+
+            </div>
+
+            <div id="btn-panel">
+                <button onclick="getCards('player', 1);">Add to hand</button><br>
+                <button onclick="requestEndTurn();">End turn</button><br>
+                <button onclick="endGame();">END GAME</button>
+            </div>  
+
+        </div>
+
+        <div id="mat">
+
+            <!-- OPPONENT -->
+            <div id="opponent-field" style="display: none;">
+
+                <div id="row-wrapper">
+
+                    <div id="opponent-deck-zone" class="card-zone">DECK</div>
+
+                    <div id="opponent-hand">
+
+                    </div>
+
+                    <div id="opponent-deck-zone" class=card-zone>GRAVEYARD</div>
+                       
+                </div> 
+
+                <div id="field-grid-wrapper">
+
+                    <div class="field-grid">
+
+                        <div class="card-zone field-zone">FIELD ZONE</div>
+                        <div class="card-zone main-zone" data-zone="1" data-card-type data-card-name><img></div>
+                        <div class="card-zone main-zone" data-zone="2" data-card-type data-card-name><img></div>
+                        <div class="card-zone main-zone" data-zone="3" data-card-type data-card-name><img></div>
+                        <div class="card-zone main-zone" data-zone="4" data-card-type data-card-name><img></div>
+                        <div class="card-zone main-zone" data-zone="5" data-card-type data-card-name><img></div>
+                        <div class="card-zone main-zone" data-zone="6" data-card-type data-card-name><img></div>
+                        <div class="card-zone main-zone" data-zone="7" data-card-type data-card-name><img></div>
+
+                    </div>
+
+                </div> 
+
+            </div>
+
+            <!-- PLAYER -->
+            <div id="player-field">
+
+                <div id="field-grid-wrapper">
+
+                    <div class="field-grid player-field-grid">
+
+                        <div class="card-zone field-zone">FIELD ZONE</div>
+                        <div class="card-zone main-zone" data-zone="1" data-card-type data-card-name><img></div>
+                        <div class="card-zone main-zone" data-zone="2" data-card-type data-card-name><img></div>
+                        <div class="card-zone main-zone" data-zone="3" data-card-type data-card-name><img></div>
+                        <div class="card-zone main-zone" data-zone="4" data-card-type data-card-name><img></div>
+                        <div class="card-zone main-zone" data-zone="5" data-card-type data-card-name><img></div>
+                        <div class="card-zone main-zone" data-zone="6" data-card-type data-card-name><img></div>
+                        <div class="card-zone main-zone" data-zone="7" data-card-type data-card-name><img></div>
+
+                    </div>
+
+                </div>
+
+                <div id="row-wrapper">
+
+                    <div id="player-deck-zone" class="card-zone">DECK</div>
+
+                    <div id="player-hand">
+
+                    </div>
+
+                    <div id="player-deck-zone" class=card-zone>GRAVEYARD</div>
+                       
+                </div>    
+
+            </div>
+
+        </div>
+    </div>
+
+    
+
+</body>
+
+</html>

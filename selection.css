@@ -1,0 +1,28 @@
+#deck-builder-info {
+    display: flex;
+    font: 1.5rem Arial;
+}
+
+#player-deck {
+    background-color: red;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-content: start;
+}
+
+#deck-selector {
+    background-color: green;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-content: start;
+}
+
+.deck-builder-card {
+    min-width: calc(var(--card-width) * 1.5);
+}
+
+p {
+    font: 2rem Arial;
+}
