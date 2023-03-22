@@ -46,9 +46,9 @@ function startGame() {
     setPhase(6)
 
     getCards('player', 5)
-    getCards('opponent', 5)
+    getCards('computer', 5)
     
-    turn = Math.round(Math.random()); // 0: player, 1: opponent
+    turn = Math.round(Math.random()); // 0: player, 1: computer
     p = getPhaseFormat()
     turn ? console.log(p + " Computer goes first") : console.log(p + " Player goes first")
     turn ? computerTurn() : playerTurn();
@@ -79,24 +79,24 @@ async function computerTurn() {
 
     setPhase(0) // Draw 
 
-    getCards('opponent', 1)
+    getCards('computer', 1)
     await sleep(1000)
 
     setPhase(1); // Standby
 
     setPhase(2) // Main Phase 1
 
-    var currentHand = [...opponent['monsters']]
+    var currentHand = [...computer['monsters']]
     for (var m in currentHand) {
 
-        if (!getFreeZones('opponent')) {
-            console.log("Opponent has no free zones left, stopping summons")
+        if (!getFreeZones('computer')) {
+            console.log("computer has no free zones left, stopping summons")
             break;
         }
 
         var monsterName = currentHand[m];
-        summonMonster('opponent', monsterName)
-        //removeMonsterFromHand('opponent', monsterName)
+        summonMonster('computer', monsterName)
+        //removeMonsterFromHand('computer', monsterName)
         await sleep(100);
     }
 
@@ -115,8 +115,8 @@ async function computerTurn() {
 
 function updateTurn(newTurn) { 
     turn = newTurn
-    turn ? console.log("Turn set to 1 (opponent's)") : console.log("Turn set to 0 (player's)")
-    turn ? $('#turn-info').text("Opponent's turn") : $('#turn-info').text("Your turn") 
+    turn ? console.log("Turn set to 1 (computer's)") : console.log("Turn set to 0 (player's)")
+    turn ? $('#turn-info').text("computer's turn") : $('#turn-info').text("Your turn") 
 } 
 
 function updatePhaseInfo() {
@@ -138,9 +138,10 @@ function requestEndTurn() {
 
 function prepareGame() {
     $('#homescreen').hide(); 
+    $('#summon-options').hide();
     $('#viewport').show();
     player = { 'monsters': [], 'spells': [], 'traps': []}
-    opponent = { 'monsters': [], 'spells': [], 'traps': []}
+    computer = { 'monsters': [], 'spells': [], 'traps': []}
     buildPlayerDeck()
 }
 
@@ -159,9 +160,9 @@ function endGame() {
     $('#viewport').hide();
     $('#homescreen').show(); 
     clearHand('player');
-    clearHand('opponent');
+    clearHand('computer');
     player = null;
-    opponent = null;
+    computer = null;
 
     // Clear & reset all fields
     $('.main-zone').each(function() {

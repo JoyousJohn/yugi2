@@ -2,14 +2,15 @@
 <html>
 <head>
     <title>Yu-Gi-Oh! Ripoff</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="selection.css">
-    <link rel="stylesheet" href="game.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/selection.css">
+    <link rel="stylesheet" href="css/.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-    <script src="cards.js"></script> 
-    <script defer src="game.js"></script> 
-    <script defer src="deck.js"></script> 
-    <script defer src="phases.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.transit/0.9.12/jquery.transit.min.js"></script>
+    <script src="js/cards.js"></script> 
+    <script defer src="js/game.js"></script> 
+    <script defer src="js/deck.js"></script> 
+    <script defer src="js/phases.js"></script> 
     <link href="https://fonts.cdnfonts.com/css/a-space-demo" rel="stylesheet">
 </head>
 
@@ -56,6 +57,14 @@
 
         <div id="turn-popup" style="display: none;"><span></span></div>
 
+        <div id="summon-options">
+        
+            <button class="summon-option" onclick="summonOptionSelected('atk')">Face-up attack</button>
+            <button class="summon-option" onclick="summonOptionSelected('def-up')">Face-up defense</button>
+            <button class="summon-option" onclick="summonOptionSelected('def-down')">Face-down defense</button>
+        
+        </div>
+
         <div id="info-panel">
 
             <div id="info-stats">
@@ -76,33 +85,33 @@
 
         <div id="mat">
 
-            <!-- OPPONENT -->
-            <div id="opponent-field" style="display: none;">
+            <!-- COMPUTER -->
+            <div id="computer-field" style="display: auto">
 
                 <div id="row-wrapper">
 
-                    <div id="opponent-deck-zone" class="card-zone">DECK</div>
+                    <div id="computer-deck-zone" class="card-zone">DECK</div>
 
-                    <div id="opponent-hand">
+                    <div id="computer-hand">
 
                     </div>
 
-                    <div id="opponent-deck-zone" class=card-zone>GRAVEYARD</div>
+                    <div id="computer-deck-zone" class=card-zone>GRAVEYARD</div>
                        
                 </div> 
 
                 <div id="field-grid-wrapper">
 
                     <div class="field-grid">
-
+                        
                         <div class="card-zone field-zone">FIELD ZONE</div>
-                        <div class="card-zone main-zone" data-zone="1" data-card-type data-card-name><img></div>
-                        <div class="card-zone main-zone" data-zone="2" data-card-type data-card-name><img></div>
-                        <div class="card-zone main-zone" data-zone="3" data-card-type data-card-name><img></div>
-                        <div class="card-zone main-zone" data-zone="4" data-card-type data-card-name><img></div>
-                        <div class="card-zone main-zone" data-zone="5" data-card-type data-card-name><img></div>
-                        <div class="card-zone main-zone" data-zone="6" data-card-type data-card-name><img></div>
-                        <div class="card-zone main-zone" data-zone="7" data-card-type data-card-name><img></div>
+                        <div class="card-zone-square" data-zone="1" data-card-type data-card-name><div class="card-zone main-zone"><img></div></div>
+                        <div class="card-zone-square" data-zone="2" data-card-type data-card-name><div class="card-zone main-zone"><img></div></div>
+                        <div class="card-zone-square" data-zone="3" data-card-type data-card-name><div class="card-zone main-zone"><img></div></div>
+                        <div class="card-zone-square" data-zone="4" data-card-type data-card-name><div class="card-zone main-zone"><img></div></div>
+                        <div class="card-zone-square" data-zone="5" data-card-type data-card-name><div class="card-zone main-zone"><img></div></div>
+                        <div class="card-zone-square" data-zone="6" data-card-type data-card-name><div class="card-zone main-zone"><img></div></div>
+                        <div class="card-zone-square" data-zone="7" data-card-type data-card-name><div class="card-zone main-zone"><img></div></div>
 
                     </div>
 
@@ -118,13 +127,13 @@
                     <div class="field-grid player-field-grid">
 
                         <div class="card-zone field-zone">FIELD ZONE</div>
-                        <div class="card-zone main-zone" data-zone="1" data-card-type data-card-name><img></div>
-                        <div class="card-zone main-zone" data-zone="2" data-card-type data-card-name><img></div>
-                        <div class="card-zone main-zone" data-zone="3" data-card-type data-card-name><img></div>
-                        <div class="card-zone main-zone" data-zone="4" data-card-type data-card-name><img></div>
-                        <div class="card-zone main-zone" data-zone="5" data-card-type data-card-name><img></div>
-                        <div class="card-zone main-zone" data-zone="6" data-card-type data-card-name><img></div>
-                        <div class="card-zone main-zone" data-zone="7" data-card-type data-card-name><img></div>
+                        <div class="card-zone-square" data-zone="1" data-card-type data-card-name><div class="card-zone main-zone"><img></div></div>
+                        <div class="card-zone-square" data-zone="2" data-card-type data-card-name><div class="card-zone main-zone"><img></div></div>
+                        <div class="card-zone-square" data-zone="3" data-card-type data-card-name><div class="card-zone main-zone"><img></div></div>
+                        <div class="card-zone-square" data-zone="4" data-card-type data-card-name><div class="card-zone main-zone"><img></div></div>
+                        <div class="card-zone-square" data-zone="5" data-card-type data-card-name><div class="card-zone main-zone"><img></div></div>
+                        <div class="card-zone-square" data-zone="6" data-card-type data-card-name><div class="card-zone main-zone"><img></div></div>
+                        <div class="card-zone-square" data-zone="7" data-card-type data-card-name><div class="card-zone main-zone"><img></div></div>
 
                     </div>
 

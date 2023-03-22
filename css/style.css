@@ -11,12 +11,18 @@
 
 #info-panel {
     position: fixed;
-    display: none;
     background-color: gray;
     font: 1.5rem A-Space Demo;
     white-space: nowrap;
     z-index: 1;
     left: 0;
+}
+
+#summon-options {
+    display: flex; 
+    flex-direction: column;
+    position: fixed; 
+    z-index: 1;
 }
 
 #mat {
@@ -37,7 +43,14 @@
 .field-grid {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    gap: 15px;
+    gap: 10px;
+}
+
+.card-zone-square {
+    width: var(--card-height);
+    background-color: cyan;
+    display: flex;
+    justify-content: center;
 }
 
 .card-zone, .card-zone > img {
@@ -56,17 +69,21 @@
     justify-content: space-between;
 }
 
-#player-hand, #opponent-hand {
+#player-hand, #computer-hand {
     display: flex;
     justify-content: center;
     /*width: 80%;*/
 }
 
-#player-hand > div, #opponent-hand > div {
+#player-hand > div, #computer-hand > div {
     width: var(--card-width);
     /*margin: auto 15px;*/
     flex: 1 0 0;
     overflow-x: hidden;
+}
+
+#player-hand > div:last-child, #computer-hand > div:last-child {
+    flex: 0 0 auto;
 }
 
 .card-img {

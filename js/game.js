@@ -1,9 +1,12 @@
 var deck;
 
 var player;
-var opponent;
+var computer;
 
 var selectedCard;
+var selectedSlot;
+
+var cardDiv = ('<div class="card-zone main-zone"><img></div>');
 
 // Populates deck variable from localStorage
 function buildPlayerDeck() {
@@ -34,13 +37,14 @@ function buildPlayerDeck() {
     //console.log(buildingDeckList)
 }
 
+// Add n cards to player/computer's hand
 function getCards(who, num) {
 
     var cardList = [];
 
     if (who === 'player') {
         cardList = deck;
-    } else if (who === 'opponent') {
+    } else if (who === 'computer') {
         cardList = (Object.keys(cards))
     }
 
@@ -55,8 +59,8 @@ function getCards(who, num) {
 
     console.log(getPhaseFormat() + " " + who + " draws a card")
 }
-function 
-removeMonsterFromHand(who, monsterName) {
+
+function removeMonsterFromHand(who, monsterName) {
     //console.log("Removing " + monsterName + " from " + who + "'s hand")
     window[who]['monsters'] = remove(window[who]['monsters'], monsterName)
     //getHand(who).find('div[data-card-name="' + monsterName + '"]').fadeOut();
@@ -68,14 +72,14 @@ function getField(who) { return $('#' + who + '-field') }
 
 function getZoneElm(who, zoneNum) { return getField(who).find('[data-zone="' + zoneNum + '"]') }
 
-function getCardElm(who, cardName) { return getHand(who).find('div[data-card-name="' + cardName + '"]').eq(0) } // or :first
+function getHandCardElm(who, cardName) { return getHand(who).find('div[data-card-name="' + cardName + '"]').eq(0) } // or :first
 
 function summonMonster(who, monsterName) {
 
     var firstFreeZone = getFirstFreeZone(who)
     print(getPhaseFormat() + " " + who + " summons monster " + monsterName + " in zone #" + firstFreeZone)
 
-    var source = getCardElm(who, monsterName);
+    var source = getHandCardElm(who, monsterName);
     var target = getZoneElm(who, firstFreeZone)
     moveCard(source, target)
 
@@ -112,11 +116,11 @@ function moveCard(source, target) {
     print("Clone position:")
     print($(clone).position())*/
 
-
     clone.animate({
 
         top: target[0].offsetTop,
-        left: target[0].offsetLeft
+        left: target[0].offsetLeft,
+        transform: 'scale(0) rotate(90deg)'
 
     }, 250, function() {
 
@@ -147,7 +151,6 @@ function setFieldCard(who, zoneNum, cardName) {
     $(targetZone).attr('data-card-type', 'monster')
     $(targetZone).attr('data-card-name', cardName)
     //$(targetZone).fadeIn(); //temporary
-
 }
 
 // (int) Return the ID of the first available card zone
@@ -179,30 +182,55 @@ function getFreeZones(who) {
     return freeZones;
 }
 
-// Select some card
+// Select some card in player's hand
 $(document).on('click', '#player-hand > .card', function() {
 
     if (selectedCard !== undefined) {
         $('.selected-card').removeClass('selected-card')
     }
 
-    selectedCard = this;
+    selectedCard = $(this);
 
     $(this).addClass('selected-card')
 })
 
-// Select caard on player's grid
+// Select caard on player's grid (placing the card)
 $(document).on('click', '.player-field-grid > div', function() {
 
     if (selectedCard !== undefined) {
-        print(selectedCard)
 
-        moveCard($(selectedCard), $(this))
+        selectedSlot = $(this);
+
+        //print(selectedCard)
+
+        summonOptions = $('#summon-options')
+        summonOptions.show();
+        summonOptions.css('top', $(this).offset().top)
+        summonOptions.css('left', $(this).offset().left)
+
+        //moveCard($(selectedCard), $(this))
 
         $('.selected-card').removeClass('selected-card')
     }
 
 })
+
+//$(document).on('click', '.summon-option', function() {
+
+function summonOptionSelected(position) {
+
+    $('#summon-options').hide();
+
+    if (position === 'def-up' || 'def-down') {
+        selectedSlot.css('transform', 'rotate(90deg');
+    }
+
+    moveCard(selectedCard, selectedSlot)
+
+    selectedCard = null;
+    selectedSlot = null;
+
+}//)
 
 
 
