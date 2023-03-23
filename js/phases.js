@@ -165,9 +165,12 @@ function endGame() {
     computer = null;
 
     // Clear & reset all fields
-    $('.main-zone').each(function() {
+    $('.card-zone-square').each(function() {
         $(this).attr('data-card-type', "")
-        $(this).attr('data-card-name', "")
+        $(this).attr('data-card-name', "");
+        $(this).removeAttr('style') // remove pos: relative and transform added by .flip. Not doing this moves card to 0, 0 of viewport on moveCard
         $(this).find('img').removeAttr('src')
+        $(this).find('.card-zone.main-zone').css('transform', '') // Remove def pos rotation
+        $(this).find('.front, .back').removeAttr('style') // Unit the .flip called on cards
     })
 }

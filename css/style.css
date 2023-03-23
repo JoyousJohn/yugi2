@@ -53,10 +53,11 @@
     justify-content: center;
 }
 
-.card-zone, .card-zone > img {
+.card-zone  { /*.card-zone > img */
     width: var(--card-width);
     height: var(--card-height);
     border: 2px solid red;
+    position: relative;
 }
 
 .field-zone { background-color: yellow; }
