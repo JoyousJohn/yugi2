@@ -1,14 +1,19 @@
+/* jquery.flip */
+
 .front > img {
     width: 100%; /* Keep the image within the card */
 }
+
+.back {
+    background-color: red;
+}
+
+/* moveCard stuff */
 
 .card { /* Have card being placed be over card-zone */
     z-index: 1;
     position: relative;
     overflow-y: hidden;
-    /*top: 0;
-    left: 0;*/
-    /*border: 2px solid green;*/
 }
 
 .card-relative {
@@ -27,19 +32,3 @@
     background-color: red;
     transform: rotateY(180deg);
 }
-
-/*.card-front > img {
-    position: absolute;
-    display: block;
-    width: 100%;
-    height: auto;
-}*/
-
-/*.front, .back {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-}*/

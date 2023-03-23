@@ -87,7 +87,7 @@ async function moveCard(source, targetSquare, isDefense, faceDown) {
     $(clone).appendTo(source.parent())
 
     source.css('transform', 'scale(0)') // Make source invisible. Can't remove since also removes clone.
-    targetLoc = targetSquare.find('div.card-zone')[0] // Get the actual card loc in card-square
+    targetSlot = targetSquare.find('div.card-zone')[0] // Get the actual card loc in card-square
 
     /*clone.animate({
 
@@ -110,15 +110,19 @@ async function moveCard(source, targetSquare, isDefense, faceDown) {
     source.flip()
     source.flip('toggle')*/
 
+    $(targetSlot).flip({
+        'trigger': 'manual',
+        'speed': -1, // To show no animation if set in defense mode. 1 works too, not sure why not 0
+    })
+
     clone.transition({ 
-        top: targetLoc.offsetTop,
-        left: targetLoc.offsetLeft,
+        top: targetSlot.offsetTop,
+        left: targetSlot.offsetLeft,
         rotate: isDefense && '90deg' || '0',
-    }, 1500, 'ease', function() {
+    }, 1000, 'ease', function() {
         clone.remove() 
         source.remove()
-        updateCardImage(targetSquare)     
-        clone.flip()
+        updateCardImage(targetSquare)           
     });
  
     // Flip card if being set
@@ -126,7 +130,10 @@ async function moveCard(source, targetSquare, isDefense, faceDown) {
         clone.find('.card-front, .card-back').transition({
             rotateY: '+=180deg',
             perspective: '50px'
-        }, 800);
+        }, 800, function() {
+            $(targetSlot).flip(true)
+        });
+
     }
     
     //console.log(target.find('div.card-zone').flip('toggle'))
@@ -134,10 +141,12 @@ async function moveCard(source, targetSquare, isDefense, faceDown) {
 
    // target.find('div.card-zone').flip('toggle');
 
+    // Actually set the moved card in the DOM
     var cardType = $(source).attr('data-card-type')
     var cardName = $(source).attr('data-card-name')
     $(targetSquare).attr('data-card-type', cardType)
     $(targetSquare).attr('data-card-name', cardName)
+    
     //console.log('waiting')
     //$(target).find('div.card-zone').flip() // Init flip
     //print('flipping')
