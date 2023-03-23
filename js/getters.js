@@ -11,7 +11,7 @@ function getFirstFreeZone(who) {
     var zone;
     var field = getField(who)
     $(field).find('.card-zone-square').each(function() {
-        print($(this))
+        //print($(this))
         var cardName = $(this).attr('data-card-name');
         if (cardName === "") {
             zone = $(this).attr('data-zone')

@@ -6,37 +6,6 @@ var computer;
 var activeCard;
 var selectedSquare;
 
-var cardDiv = ('<div class="card-zone main-zone"><img></div>');
-
-// Populates deck variable from localStorage
-function buildPlayerDeck() {
-
-    if (localStorage.getItem('deck') === null) {
-        deck = Object.keys(cards)
-        //console.log(deck)
-        return;
-    }
-
-    var buildingDeckList = []
-
-    localDeck = JSON.parse(localStorage.getItem('deck'))
-    cardList = Object.keys(localDeck)
-
-    for (var c in cardList) {
-
-        var quantOfThisCard = localDeck[cardList[c]]
-        
-        for (var i = 0; i < quantOfThisCard; i++) {
-            buildingDeckList.push(cardList[c]) // cardList[c]: card name
-        }
-
-    }
-
-    deck = buildingDeckList
-
-    //console.log(buildingDeckList)
-}
-
 // Add n cards to player/computer's hand
 function getCards(who, num) {
 
@@ -85,23 +54,10 @@ async function moveCard(source, targetSquare, isDefense, faceDown) {
     });
 
     $(clone).appendTo(source.parent())
+    source.remove()
 
     source.css('transform', 'scale(0)') // Make source invisible. Can't remove since also removes clone.
     targetSlot = targetSquare.find('div.card-zone')[0] // Get the actual card loc in card-square
-
-    /*clone.animate({
-
-        top: targetLoc.offsetTop,
-        left: targetLoc.offsetLeft,
-        transform: 'scale(0) rotate(90deg)'
-
-    }, 250, function() {
-
-        clone.remove() 
-        source.remove()
-        updateCardImage(target)
-
-    });*/
 
     //$(target).find('div.card-zone').flip() // Init flip
     //$(target).find('div.card-zone').flip('toggle');
@@ -174,7 +130,6 @@ $(document).on('click', 'div.card-zone-square', function() {
     if (activeCard !== null) {
 
         selectedSquare = $(this);
-        console.log(selectedSquare)
         summonOptions = $('#summon-options')
         summonOptions.show();
         summonOptions.css('top', $(this).offset().top)
