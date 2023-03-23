@@ -130,18 +130,3 @@ function setBuildingDeckSize(newSize) { // Update deck size
     $('#card-count').attr('card-Count', newSize);
     $('#card-count').text('Deck size: ' + newSize + '/60')
 }
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// Remove first occurance of value from arr
-function remove(arr, value) {
-    var index = arr.indexOf(value);
-    if (index > -1) {
-        arr.splice(index, 1);
-    }
-    return arr;
-}
-
-function print(message) { console.log(message) }

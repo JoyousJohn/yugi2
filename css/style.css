@@ -91,7 +91,7 @@
     max-width: var(--card-width);
 }
 
-.selected-card {
+.active-card {
     border: 5px solid blue;
 }
 
