@@ -83,7 +83,6 @@ function remove(arr, value) {
     if (index > -1) {
         arr.splice(index, 1);
     }
-    print('new arr: ' + arr)
     return arr;
 }
 

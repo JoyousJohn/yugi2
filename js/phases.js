@@ -115,7 +115,7 @@ async function computerTurn() {
 
 function updateTurn(newTurn) { 
     turn = newTurn
-    turn ? console.log("Turn set to 1 (computer's)") : console.log("Turn set to 0 (player's)")
+    turn ? print("Turn set to 1 (computer's)") : print("Turn set to 0 (player's)")
     turn ? $('#turn-info').text("computer's turn") : $('#turn-info').text("Your turn") 
 } 
 
@@ -129,7 +129,7 @@ function getPhaseFormat() {
 
 function requestEndTurn() {
     if (turn === 0) {
-        console.log(getPhaseFormat() + " Player ends their turn")
+        if (printMoves) print(getPhaseFormat() + " Player ends their turn")
         computerTurn();
     } else {
         alert('not your turn')

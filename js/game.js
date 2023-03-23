@@ -6,6 +6,8 @@ var computer;
 var activeCard;
 var selectedSquare;
 
+var printMoves = true;
+
 // Add n cards to player/computer's hand
 function getCards(who, num) {
 
@@ -26,13 +28,13 @@ function getCards(who, num) {
         window[who][type].push(card)
     }
 
-    console.log(getPhaseFormat() + " " + who + " draws a card")
+    if (printMoves) print(getPhaseFormat() + " " + who + " draws a card")
 }
 
 function summonMonster(who, monsterName) {
 
     var firstFreeZone = getFirstFreeZone(who)
-    print(getPhaseFormat() + " " + who + " summons monster " + monsterName + " in zone #" + firstFreeZone)
+    if (printMoves) print(getPhaseFormat() + " " + who + " summons monster " + monsterName + " in zone #" + firstFreeZone)
 
     var source = getHandCardElm(who, monsterName);
     var target = getSquareElm(who, firstFreeZone)
@@ -59,13 +61,6 @@ async function moveCard(source, targetSquare, isDefense, faceDown) {
     source.css('transform', 'scale(0)') // Make source invisible. Can't remove since also removes clone.
     targetSlot = targetSquare.find('div.card-zone')[0] // Get the actual card loc in card-square
 
-    //$(target).find('div.card-zone').flip() // Init flip
-    //$(target).find('div.card-zone').flip('toggle');
-    /*print(source)
-    print($(source))
-    source.flip()
-    source.flip('toggle')*/
-
     $(targetSlot).flip({
         'trigger': 'manual',
         'speed': -1, // To show no animation if set in defense mode. 1 works too, not sure why not 0
@@ -86,29 +81,18 @@ async function moveCard(source, targetSquare, isDefense, faceDown) {
         clone.find('.card-front, .card-back').transition({
             rotateY: '+=180deg',
             perspective: '50px'
-        }, 800, function() {
+        }, 800, async function() {
+            await sleep(100) // Din't show newly placed card until rotate + move animation finished
             $(targetSlot).flip(true)
         });
 
     }
-    
-    //console.log(target.find('div.card-zone').flip('toggle'))
-    //console.log($(target).find('div.card-zone'))
-
-   // target.find('div.card-zone').flip('toggle');
 
     // Actually set the moved card in the DOM
     var cardType = $(source).attr('data-card-type')
     var cardName = $(source).attr('data-card-name')
     $(targetSquare).attr('data-card-type', cardType)
     $(targetSquare).attr('data-card-name', cardName)
-    
-    //console.log('waiting')
-    //$(target).find('div.card-zone').flip() // Init flip
-    //print('flipping')
-   //await sleep(550)
-    //print('toggling')
-    //$(target).find('div.card-zone').flip('toggle');
 
 }
 
