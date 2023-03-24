@@ -90,14 +90,14 @@ async function computerTurn() {
     for (var m in currentHand) {
 
         if (!getNumOfFreeZones('computer')) {
-            console.log("computer has no free zones left, stopping summons")
+            if (printMoves) print("Computer has no free zones left, stopping summons")
             break;
         }
 
         var monsterName = currentHand[m];
         summonMonster('computer', monsterName)
         //removeMonsterFromHand('computer', monsterName)
-        await sleep(100);
+        await sleep(500);
     }
 
     setPhase(3) // Battle Phase
@@ -107,7 +107,7 @@ async function computerTurn() {
     setPhase(5) // End Phase
     await sleep(1000)
 
-    console.log("[" + phases[phase]['phaseName'] + " Phase] Computer ends their turn")
+    console.log(getPhaseFormat() + " Computer ends their turn")
 
     playerTurn();
 
@@ -140,7 +140,7 @@ function requestEndTurn() {
         computerTurn();
 
     } else { alert('not your turn') }
-    
+
 }
 
 function prepareGame() {

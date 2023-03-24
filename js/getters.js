@@ -4,7 +4,9 @@ function getField(who) { return $('#' + who + '-field') }
 
 function getSquareElm(who, zoneNum) { return getField(who).find('[data-zone="' + zoneNum + '"]') }
 
-function getHandCardElm(who, cardName) { return getHand(who).find('div[data-card-name="' + cardName + '"]').eq(0) } // or :first
+function getHandCardElm(who, cardName) { 
+    return getHand(who).find('div.card[data-card-name="' + cardName + '"]').not('[is-source-of-clone=true]').eq(0) 
+}
 
 // (int) Return the ID of the first available card zone
 function getFirstFreeZone(who) {

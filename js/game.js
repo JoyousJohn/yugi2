@@ -16,7 +16,7 @@ function getCards(who, num) {
     if (who === 'player') {
         cardList = deck;
     } else if (who === 'computer') {
-        cardList = (Object.keys(cards))
+        cardList = (Object.keys(cards));
     }
 
     for (var i = 0; i < num; i++) {
@@ -36,7 +36,7 @@ function summonMonster(who, monsterName) {
     var firstFreeZone = getFirstFreeZone(who)
     if (printMoves) print(getPhaseFormat() + " " + who + " summons monster " + monsterName + " in zone #" + firstFreeZone)
 
-    var source = getHandCardElm(who, monsterName);
+    let source = getHandCardElm(who, monsterName); // make sure the sourcec doesn't have class "clone"
     var target = getSquareElm(who, firstFreeZone)
     moveCard('computer', source, target)
 
@@ -45,9 +45,12 @@ function summonMonster(who, monsterName) {
 }
 
 // Move a card (from hand) to board position
-function moveCard(who, source, targetSquare, isDefense, faceDown) {
+async function moveCard(who, source, targetSquare, isDefense, faceDown) {
 
-    var clone = source.clone();
+    source.attr('is-source-of-clone', true) // So the next getHandCardElm doesn't return the invisible (scale(0)) instead of next card in hand of the same monster
+
+    const clone = source.clone();
+    clone.attr('is-moving-clone', true) // Not used for anything, just helper
     
     clone.css({
         position: 'absolute',
@@ -61,45 +64,51 @@ function moveCard(who, source, targetSquare, isDefense, faceDown) {
     source.css('transform', 'scale(0)') // Make source invisible. Can't remove since also removes clone.
     let targetZone = targetSquare.find('div.card-zone')[0] // Get the actual card loc in card-square
 
-    function b(c) {
-        c.flip({
-            //'trigger': 'manual',
-            'speed': -1, // To show no animation if set in defense mode. 1 works too, not sure why not 0
-        })
-    }
-    b($(targetZone)) // Callback, w/o only affects last card moved by end of delay
+    $(targetZone).flip({
+        //'trigger': 'manual',
+        'speed': -1, // To show no animation if set in defense mode. 1 works too, not sure why not 0
+    })
+
+    //flip($(targetZone)) // Callback, w/o only affects last card moved by end of delay
 
     clone.transition({ 
         top: targetZone.offsetTop,
         left: targetZone.offsetLeft,
         rotate: isDefense && '90deg' || '0',
         rotateX: 0 // Only applies to computer currently as player is already 0. Check card.css.
-    }, 1000, 'ease', function() {
+    }, 1500, 'ease', async function() {
         clone.remove() 
         source.remove()
-        updateCardImage(targetSquare)     
+        updateCardImage(targetSquare)   
+
+        $(targetZone).show() // If hidden by player setting card face-down
+
+        // Set flip status to flipped if placed by computer
+        if (who === 'computer') {     
+            setFlipDefense($(targetZone))
+        }
+        await sleep(100)
         updateFlipSpeed(targetZone, 500)  // newSpeed in ms
+
     });
  
     // Visually flip moving card if being set
     if (who === 'player' && faceDown) {
+
+        $(targetZone).hide()
+        setFlipDefense($(targetZone))
+        await sleep(100) // Without delay the flip above is visible
+        updateFlipSpeed(targetZone, 500)
+
         clone.find('.card-front, .card-back').transition({
             rotateY: '+=180deg',
             perspective: '50px'
-        }, 800, async function() {
-            await sleep(100) // Din't show newly placed card until rotate + move animation finished
-            $(targetZone).flip(true)
-            /*setTimeout(function() { // Alternate method
-                $(targetZone).flip(true)
-            }, 100);*/
+        }, 800, async function() { // Delay has to be < transition move delay or else setting flip status to flipped animation is visible
+            
+            //setFlipDefense($(targetZone))
+            //await sleep(100) // Without delay the flip above is visible
+            //updateFlipSpeed(targetZone, 500)
         });
-    }
-
-    // Set flip status to flipped if placed by computer
-    if (who === 'computer') {
-        setTimeout(function() {
-            $(targetZone).flip(true) // Set placed card-data to flipped face-down.
-        }, 900);      
     }
 
     // Actually set the moved card in the DOM
@@ -108,6 +117,12 @@ function moveCard(who, source, targetSquare, isDefense, faceDown) {
     $(targetSquare).attr('data-card-type', cardType)
     $(targetSquare).attr('data-card-name', cardName)
 
+}
+
+
+
+function setFlipDefense(c) {
+    $(c).flip(true) // Set placed card-data to flipped face-down.
 }
 
 async function updateFlipSpeed(flipElm, newSpeed) {
