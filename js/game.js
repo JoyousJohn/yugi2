@@ -49,43 +49,38 @@ function moveCard(who, source, targetSquare, isDefense, faceDown) {
     var clone = source.clone();
     
     clone.css({
-        position: 'absolute', //absolute
+        position: 'absolute',
         margin: 0,
-        top: source[0].offsetTop, // - 26,E
-        left: (source[0].offsetLeft) //- parseInt(source.css('margin-left')) //+ 11,
+        top: source[0].offsetTop,
+        left: (source[0].offsetLeft)
     });
 
     $(clone).appendTo(source.parent())
-    //source.remove()
 
     source.css('transform', 'scale(0)') // Make source invisible. Can't remove since also removes clone.
     let targetSlot = targetSquare.find('div.card-zone')[0] // Get the actual card loc in card-square
-    //print(targetSlot)
 
     function b(c) {
-        print("flipping targetSlot: ")
-        print(c)
         c.flip({
-            'trigger': 'manual',
+            //'trigger': 'manual',
             'speed': -1, // To show no animation if set in defense mode. 1 works too, not sure why not 0
         })
     }
-    b($(targetSlot))
-
-    
+    b($(targetSlot)) // Callback, w/o only affects last card moved by end of delay
 
     clone.transition({ 
         top: targetSlot.offsetTop,
         left: targetSlot.offsetLeft,
         rotate: isDefense && '90deg' || '0',
+        rotateX: 0
     }, 1000, 'ease', function() {
         clone.remove() 
         source.remove()
         updateCardImage(targetSquare)     
-        //if (who === 'computer') $(targetSlot).flip(true)
+        updateFlipSpeed(targetSlot, 500)  // newSpeed in ms
     });
  
-    // Flip card if being set
+    // Visually flip moving card if being set
     if (who === 'player' && faceDown) {
         clone.find('.card-front, .card-back').transition({
             rotateY: '+=180deg',
@@ -93,28 +88,17 @@ function moveCard(who, source, targetSquare, isDefense, faceDown) {
         }, 800, async function() {
             await sleep(100) // Din't show newly placed card until rotate + move animation finished
             $(targetSlot).flip(true)
+            /*setTimeout(function() { // Alternate method
+                $(targetSlot).flip(true)
+            }, 100);*/
         });
     }
 
+    // Set flip status to flipped if placed by computer
     if (who === 'computer') {
-
-        /*async function a(m) {
-            /*setTimeout(function(){
-                console.log('flipping')
-                m.flip(true)
-                print(m.parent())
-                //print($(targetSlot).parent())
-            }, 900);
-            
-        }
-
-        a($(targetSlot))*/
-
         setTimeout(function() {
-            //print($(targetSlot).parent())
-            $(targetSlot).flip(true)
-        }, 900);
-        
+            $(targetSlot).flip(true) // Set placed card-data to flipped face-down.
+        }, 900);      
     }
 
     // Actually set the moved card in the DOM
@@ -123,6 +107,12 @@ function moveCard(who, source, targetSquare, isDefense, faceDown) {
     $(targetSquare).attr('data-card-type', cardType)
     $(targetSquare).attr('data-card-name', cardName)
 
+}
+
+async function updateFlipSpeed(flipElm, newSpeed) {
+    flipElm = $(flipElm)
+    flipElm.data('flip-model').setting.speed = 500; // Not sure if affects anything
+    flipElm.find('div.front, div.back').css('transition', 'all ' + newSpeed + 'ms ease-out 0s') // Change transition speed
 }
 
 // Select some card in player's hand
@@ -138,9 +128,9 @@ $(document).on('click', '#player-hand > .card', function() {
 })
 
 // Select card on player's grid (placing the card)
-$(document).on('click', 'div.card-zone-square', function() {
+$(document).on('click', '.player-field-grid div.card-zone-square', function() {
 
-    if (activeCard !== null) {
+    if (activeCard !== null && isSquareEmpty($(this))) { // Confirm an active card is selected and target square is available
 
         selectedSquare = $(this);
         summonOptions = $('#summon-options')
@@ -152,8 +142,6 @@ $(document).on('click', 'div.card-zone-square', function() {
     }
 
 })
-
-//$(document).on('click', '.summon-option', function() {
 
 function summonOptionSelected(position) {
 

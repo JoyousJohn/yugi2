@@ -33,3 +33,8 @@ function getFreeZones(who) {
     })
     return freeZones;
 }
+
+// (boolean) Return if squareElm is empty
+function isSquareEmpty(squareElm) {
+    return squareElm.attr('data-card-name') === ''
+}

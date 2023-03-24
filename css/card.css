@@ -49,3 +49,11 @@
 #computer-hand div.card-front {
     transform: rotateY(180deg);
 }
+
+#computer-hand > .card {
+    transform: rotateX(-50deg);
+}
+
+#player-hand > .card {
+    transform: rotateX(0deg);
+}

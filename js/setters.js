@@ -23,19 +23,19 @@ function buildPlayerDeck() {
     }
 
     deck = buildingDeckList
-
     //console.log(buildingDeckList)
 }
 
+// Remove monster string from who.monsters array
 function removeMonsterFromHandVar(who, monsterName) {
-    console.log("Removing " + monsterName + " from " + who + "'s hand")
+    if (printMoves) print("Removing " + monsterName + " from " + who + "'s hand")
     window[who]['monsters'] = remove(window[who]['monsters'], monsterName)
     //getHand(who).find('div[data-card-name="' + monsterName + '"]').fadeOut();
 }
 
-function updateCardImage(elm) {
-    var cardName = $(elm).attr('data-card-name')
-    $(elm).find('img').attr('src', 'cards/' + cards[cardName]['file'])
+function updateCardImage(squareElm) {
+    const cardName = $(squareElm).attr('data-card-name')
+    $(squareElm).find('img').attr('src', 'cards/' + cards[cardName]['file'])
 }
 
 function clearHand(who) {
