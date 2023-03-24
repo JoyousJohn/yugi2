@@ -120,7 +120,7 @@ function updateTurn(newTurn) {
 } 
 
 function updatePhaseInfo() {
-    $('#game-phase').text(phases[phase].phaseName)
+    $('#game-phase').text(phases[phase].phaseName.toUpperCase())
 }
 
 function getPhaseFormat() {
@@ -166,11 +166,16 @@ function endGame() {
 
     // Clear & reset all fields
     $('.card-zone-square').each(function() {
-        $(this).attr('data-card-type', "")
-        $(this).attr('data-card-name', "");
-        $(this).removeAttr('style') // remove pos: relative and transform added by .flip. Not doing this moves card to 0, 0 of viewport on moveCard
-        $(this).find('img').removeAttr('src')
-        $(this).find('.card-zone.main-zone').css('transform', '') // Remove def pos rotation
-        $(this).find('.front, .back').removeAttr('style') // Unit the .flip called on cards
+        resetSquare(this);
     })
+}
+
+function resetSquare(squareElm) {
+    $(squareElm).find('div').removeData("flip-model") // Unitialize .flip
+    $(squareElm).attr('data-card-type', "")
+    $(squareElm).attr('data-card-name', "");
+    //$(this).removeAttr('style') // remove pos: relative added by .flip. Not doing this moves card to 0, 0 of viewport on moveCard
+    $(squareElm).find('img').removeAttr('src')
+    $(squareElm).find('.card-zone.main-zone').css('transform', '') // Remove def pos rotation
+    $(squareElm).find('.front, .back').removeAttr('style') // Remove many props added by .flip
 }

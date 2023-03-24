@@ -1,3 +1,10 @@
+/* General */
+
+#computer-graveyard-zone, #player-graveyard-zone, #computer-deck-zone, #player-deck-zone, .field-zone {
+    background-color: pink;
+    font-size: 16rem; /* temp */
+}
+
 /* jquery.flip */
 
 .front > img {
@@ -32,5 +39,13 @@
     height: 100%;
     background-image: url('../cards/card back 2.png');
     background-size: cover;
+}
+
+#player-field .card-back {
+    transform: rotateY(180deg);
+}
+
+/* In-hand */
+#computer-hand div.card-front {
     transform: rotateY(180deg);
 }

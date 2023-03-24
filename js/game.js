@@ -6,7 +6,7 @@ var computer;
 var activeCard;
 var selectedSquare;
 
-var printMoves = true;
+var printMoves = false;
 
 // Add n cards to player/computer's hand
 function getCards(who, num) {
@@ -38,13 +38,13 @@ function summonMonster(who, monsterName) {
 
     var source = getHandCardElm(who, monsterName);
     var target = getSquareElm(who, firstFreeZone)
-    moveCard(source, target)
+    moveCard('computer', source, target)
 
     removeMonsterFromHandVar(who, monsterName)
 
 }
 
-async function moveCard(source, targetSquare, isDefense, faceDown) {
+function moveCard(who, source, targetSquare, isDefense, faceDown) {
 
     var clone = source.clone();
     
@@ -56,15 +56,23 @@ async function moveCard(source, targetSquare, isDefense, faceDown) {
     });
 
     $(clone).appendTo(source.parent())
-    source.remove()
+    //source.remove()
 
     source.css('transform', 'scale(0)') // Make source invisible. Can't remove since also removes clone.
-    targetSlot = targetSquare.find('div.card-zone')[0] // Get the actual card loc in card-square
+    let targetSlot = targetSquare.find('div.card-zone')[0] // Get the actual card loc in card-square
+    //print(targetSlot)
 
-    $(targetSlot).flip({
-        'trigger': 'manual',
-        'speed': -1, // To show no animation if set in defense mode. 1 works too, not sure why not 0
-    })
+    function b(c) {
+        print("flipping targetSlot: ")
+        print(c)
+        c.flip({
+            'trigger': 'manual',
+            'speed': -1, // To show no animation if set in defense mode. 1 works too, not sure why not 0
+        })
+    }
+    b($(targetSlot))
+
+    
 
     clone.transition({ 
         top: targetSlot.offsetTop,
@@ -73,11 +81,12 @@ async function moveCard(source, targetSquare, isDefense, faceDown) {
     }, 1000, 'ease', function() {
         clone.remove() 
         source.remove()
-        updateCardImage(targetSquare)           
+        updateCardImage(targetSquare)     
+        //if (who === 'computer') $(targetSlot).flip(true)
     });
  
     // Flip card if being set
-    if (faceDown) {
+    if (who === 'player' && faceDown) {
         clone.find('.card-front, .card-back').transition({
             rotateY: '+=180deg',
             perspective: '50px'
@@ -85,7 +94,27 @@ async function moveCard(source, targetSquare, isDefense, faceDown) {
             await sleep(100) // Din't show newly placed card until rotate + move animation finished
             $(targetSlot).flip(true)
         });
+    }
 
+    if (who === 'computer') {
+
+        /*async function a(m) {
+            /*setTimeout(function(){
+                console.log('flipping')
+                m.flip(true)
+                print(m.parent())
+                //print($(targetSlot).parent())
+            }, 900);
+            
+        }
+
+        a($(targetSlot))*/
+
+        setTimeout(function() {
+            //print($(targetSlot).parent())
+            $(targetSlot).flip(true)
+        }, 900);
+        
     }
 
     // Actually set the moved card in the DOM
@@ -143,7 +172,7 @@ function summonOptionSelected(position) {
         isDefense = false;
     }
 
-    moveCard(activeCard, selectedSquare, isDefense, faceDown) // source, target
+    moveCard('player', activeCard, selectedSquare, isDefense, faceDown) // source, target
     removeMonsterFromHandVar('player', activeCard.attr('data-card-name'))
 
     activeCard = null;

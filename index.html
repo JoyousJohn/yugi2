@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html style="font-size: 6.25%">
 <head>
     <title>Yu-Gi-Oh! Ripoff</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/selection.css">
     <link rel="stylesheet" href="css/game.css">
     <link rel="stylesheet" href="css/card.css">
+    <link rel="stylesheet" href="css/info.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.transit/0.9.12/jquery.transit.min.js"></script>
     <script src="https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js"></script>
@@ -22,7 +23,7 @@
 
     <div id="homescreen">
 
-        <h1 style="font: 4rem Arial;">yugi-2</h1>
+        <h1 style="font: 64rem Arial;">yugi-2</h1>
 
         <button onclick="startGame();">START GAME</button>
         <button onclick="buildDecks();">DECK BUILDER</button>
@@ -100,7 +101,7 @@
 
                     </div>
 
-                    <div id="computer-deck-zone" class=card-zone>GRAVEYARD</div>
+                    <div id="computer-graveyard-zone" class="card-zone">GRAVEYARD</div>
                        
                 </div> 
 
@@ -161,16 +162,6 @@
                         </div>
 
                         <div class="card-zone-square" data-zone="6" data-card-type data-card-name>
-                            <div class="card-zone main-zone">
-                                <div class="front">
-                                    <img>
-                                </div>
-                                <div class="back">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-zone-square" data-zone="7" data-card-type data-card-name>
                             <div class="card-zone main-zone">
                                 <div class="front">
                                     <img>
@@ -254,16 +245,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="card-zone-square" data-zone="7" data-card-type data-card-name>
-                            <div class="card-zone main-zone">
-                                <div class="front">
-                                    <img>
-                                </div>
-                                <div class="back">
-                                </div>
-                            </div>
-                        </div>
                         
                     </div>
 
@@ -277,7 +258,7 @@
 
                     </div>
 
-                    <div id="player-deck-zone" class=card-zone>GRAVEYARD</div>
+                    <div id="player-graveyard-zone" class="card-zone">GRAVEYARD</div>
                        
                 </div>    
 

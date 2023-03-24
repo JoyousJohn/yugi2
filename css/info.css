@@ -1,0 +1,11 @@
+#info-panel {
+    background-color: gray;
+    font: 24rem A-Space Demo;
+    white-space: nowrap;
+    padding: 15px;
+    width: 25%;
+}
+
+#game-phase {
+    font-family: A-Space Demo;
+}
