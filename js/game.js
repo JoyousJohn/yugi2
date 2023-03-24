@@ -59,56 +59,53 @@ async function moveCard(who, source, targetSquare, isDefense, faceDown) {
         left: (source[0].offsetLeft)
     });
 
-    $(clone).appendTo(source.parent())
+    $(clone).appendTo(source.parent()) // Add new clone to hand of cards to immitate being moved from hand
 
     source.css('transform', 'scale(0)') // Make source invisible. Can't remove since also removes clone.
-    let targetZone = targetSquare.find('div.card-zone')[0] // Get the actual card loc in card-square
+    let targetZone = targetSquare.find('div.card-zone') // Get the actual card loc in card-square
 
-    $(targetZone).flip({
+    targetZone.flip({ // Init flip
         //'trigger': 'manual',
         'speed': -1, // To show no animation if set in defense mode. 1 works too, not sure why not 0
     })
 
-    //flip($(targetZone)) // Callback, w/o only affects last card moved by end of delay
-
+    // Move the card
     clone.transition({ 
-        top: targetZone.offsetTop,
-        left: targetZone.offsetLeft,
-        rotate: isDefense && '90deg' || '0',
-        rotateX: 0 // Only applies to computer currently as player is already 0. Check card.css.
+        top: targetZone[0].offsetTop,
+        left: targetZone[0].offsetLeft,
+        rotate: isDefense && '90deg' || '0', // Rotate sideways if is set in defense
+        rotateX: 0 // Rotates perspective of card being held up. Only applies to computer currently as player is already 0. Check card.css. 
     }, 1500, 'ease', async function() {
         clone.remove() 
         source.remove()
         updateCardImage(targetSquare)   
 
-        $(targetZone).show() // If hidden by player setting card face-down
-
         // Set flip status to flipped if placed by computer
         if (who === 'computer') {     
-            setFlipDefense($(targetZone))
+            targetZone.flip(true) // Set placed card-data to flipped face-down.
+            await sleep(100) // So updateFlipSpeed() animation below isn't visible
         }
-        await sleep(100)
+        
         updateFlipSpeed(targetZone, 500)  // newSpeed in ms
+        targetZone.show() // Unhide if hidden by player setting card face-down - can add if visible condition later
 
     });
  
-    // Visually flip moving card if being set
+    // Visually flip over moving card if being set
     if (who === 'player' && faceDown) {
 
-        $(targetZone).hide()
-        setFlipDefense($(targetZone))
-        await sleep(100) // Without delay the flip above is visible
+        targetZone.hide() // Hide target zone so defense animation isn't shown
+        targetZone.flip(true) // Set placed card-data to flipped face-down.
+        //await sleep(100) // Without delay the flip above is visible <-- either this or .hide/.show would both work
         updateFlipSpeed(targetZone, 500)
-
+        print('set facedown')
         clone.find('.card-front, .card-back').transition({
             rotateY: '+=180deg',
             perspective: '50px'
-        }, 800, async function() { // Delay has to be < transition move delay or else setting flip status to flipped animation is visible
-            
-            //setFlipDefense($(targetZone))
-            //await sleep(100) // Without delay the flip above is visible
-            //updateFlipSpeed(targetZone, 500)
         });
+    } else if (who === 'player') {
+        //targetZone.flip(false)
+        print('set to false')
     }
 
     // Actually set the moved card in the DOM
@@ -117,12 +114,6 @@ async function moveCard(who, source, targetSquare, isDefense, faceDown) {
     $(targetSquare).attr('data-card-type', cardType)
     $(targetSquare).attr('data-card-name', cardName)
 
-}
-
-
-
-function setFlipDefense(c) {
-    $(c).flip(true) // Set placed card-data to flipped face-down.
 }
 
 async function updateFlipSpeed(flipElm, newSpeed) {
@@ -139,7 +130,7 @@ $(document).on('click', '#player-hand > .card', function() {
         if (isSummonOptionsVisible()) $('#summon-options').hide(); // Hide summon options if visible. Should only be visible if active card selected...
     }
 
-    activeCard = $(this);
+    activeCard = $(this); // Set new activeCard var
 
     $(this).addClass('active-card')
 
@@ -154,22 +145,25 @@ $(document).on('click', '#player-hand > .card', function() {
 // Select card on player's grid (placing the card)
 $(document).on('click', '.player-field-grid div.card-zone-square', function() {
 
-    if (activeCard !== null && isSquareEmpty($(this))) { // Confirm an active card is selected and target square is available
+    isAlreadySelected = selectedSquare && ($(this)).is(selectedSquare) // Is selected square already selected. Need to make sure selectedSquare is set first before comparing or else error.
 
+    if (activeCard !== null && !isAlreadySelected && isSquareEmpty($(this))) { // Confirm an active card is selected and target square is available
+
+        // Probably a temp menu
         selectedSquare = $(this);
         summonOptions = $('#summon-options')
         summonOptions.show();
         summonOptions.css('top', $(this).offset().top)
         summonOptions.css('left', $(this).offset().left)
 
-        $('.active-card').removeClass('active-card')
     }
 
 })
 
 function summonOptionSelected(position) {
 
-    $('#summon-options').hide();
+    $('.active-card').removeClass('active-card') // Remove css from active caard
+    $('#summon-options').hide(); // Remove summon options button menu
     
     clearAvailableZones() // Do this before moving card since getAvailableSquaresElms() wouldn't return target zone then
 

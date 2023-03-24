@@ -181,13 +181,23 @@ function endGame() {
 function resetAllSquares(squareElm) {
 
     $('.card-zone-square').each(function() {
-        $(this).find('div').removeData("flip-model") // Unitialize .flip
+
+        $(this).find('div.card-zone').off(".flip"); // Removes flip click listener. Not having this means the card will flip (new transformY is added when summon option menu opens) when selecting a zone to summon a card after first placemenet. Took wayyyy too long to figure this out.
+
         $(this).attr('data-card-type', "")
         $(this).attr('data-card-name', "");
+
+        $(this).find('div.card-zone').removeData("flip-model") // Unitialize .flip
+
+        $(this).find('div.card-zone').removeData('transform') // Removes rotate 90deg and perspective 200px from transform data. Not sure why the perspective is this amount.
+        $(this).find('div.card-zone').removeAttr('style') // Remove rotate 90deg, perspective 200px, and position relative from visible css attributes
+        
         //$(this).removeAttr('style') // remove pos: relative added by .flip. Not doing this moves card to 0, 0 of viewport on moveCard
         $(this).find('img').removeAttr('src')
-        $(this).find('.card-zone.main-zone').css('transform', '') // Remove def pos rotation
+        $(this).find('img').removeAttr('style') // Remove backface-visibility from front > img. Not sure if this really affects anything.
+        
         $(this).find('.front, .back').removeAttr('style') // Remove many props added by .flip
+        $(this).find('.front, .back').removeData('transform') // Removes rotateY. Not sure if actually required. Should really just delete all elms and make sure ones on new game lol
     })
 
 }
