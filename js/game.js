@@ -44,6 +44,7 @@ function summonMonster(who, monsterName) {
 
 }
 
+// Move a card (from hand) to board position
 function moveCard(who, source, targetSquare, isDefense, faceDown) {
 
     var clone = source.clone();
@@ -58,7 +59,7 @@ function moveCard(who, source, targetSquare, isDefense, faceDown) {
     $(clone).appendTo(source.parent())
 
     source.css('transform', 'scale(0)') // Make source invisible. Can't remove since also removes clone.
-    let targetSlot = targetSquare.find('div.card-zone')[0] // Get the actual card loc in card-square
+    let targetZone = targetSquare.find('div.card-zone')[0] // Get the actual card loc in card-square
 
     function b(c) {
         c.flip({
@@ -66,18 +67,18 @@ function moveCard(who, source, targetSquare, isDefense, faceDown) {
             'speed': -1, // To show no animation if set in defense mode. 1 works too, not sure why not 0
         })
     }
-    b($(targetSlot)) // Callback, w/o only affects last card moved by end of delay
+    b($(targetZone)) // Callback, w/o only affects last card moved by end of delay
 
     clone.transition({ 
-        top: targetSlot.offsetTop,
-        left: targetSlot.offsetLeft,
+        top: targetZone.offsetTop,
+        left: targetZone.offsetLeft,
         rotate: isDefense && '90deg' || '0',
-        rotateX: 0
+        rotateX: 0 // Only applies to computer currently as player is already 0. Check card.css.
     }, 1000, 'ease', function() {
         clone.remove() 
         source.remove()
         updateCardImage(targetSquare)     
-        updateFlipSpeed(targetSlot, 500)  // newSpeed in ms
+        updateFlipSpeed(targetZone, 500)  // newSpeed in ms
     });
  
     // Visually flip moving card if being set
@@ -87,9 +88,9 @@ function moveCard(who, source, targetSquare, isDefense, faceDown) {
             perspective: '50px'
         }, 800, async function() {
             await sleep(100) // Din't show newly placed card until rotate + move animation finished
-            $(targetSlot).flip(true)
+            $(targetZone).flip(true)
             /*setTimeout(function() { // Alternate method
-                $(targetSlot).flip(true)
+                $(targetZone).flip(true)
             }, 100);*/
         });
     }
@@ -97,7 +98,7 @@ function moveCard(who, source, targetSquare, isDefense, faceDown) {
     // Set flip status to flipped if placed by computer
     if (who === 'computer') {
         setTimeout(function() {
-            $(targetSlot).flip(true) // Set placed card-data to flipped face-down.
+            $(targetZone).flip(true) // Set placed card-data to flipped face-down.
         }, 900);      
     }
 
@@ -120,11 +121,19 @@ $(document).on('click', '#player-hand > .card', function() {
 
     if (activeCard !== null) {
         $('.active-card').removeClass('active-card')
+        if (isSummonOptionsVisible()) $('#summon-options').hide(); // Hide summon options if visible. Should only be visible if active card selected...
     }
 
     activeCard = $(this);
 
     $(this).addClass('active-card')
+
+    const availableSquares = getAvailableSquaresElms()
+
+    for (const square of availableSquares) {
+        square.find('div.card-zone.main-zone').addClass('available-zone')
+    }
+
 })
 
 // Select card on player's grid (placing the card)
@@ -146,6 +155,8 @@ $(document).on('click', '.player-field-grid div.card-zone-square', function() {
 function summonOptionSelected(position) {
 
     $('#summon-options').hide();
+    
+    clearAvailableZones() // Do this before moving card since getAvailableSquaresElms() wouldn't return target zone then
 
     if (position === 'def-down') {
         faceDown = true;

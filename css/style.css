@@ -3,6 +3,10 @@
     --card-height: calc(var(--card-width) * 1.45)
 }
 
+/* {
+    box-sizing: border-box;
+}*/
+
 #viewport {
     display: flex;
     height: 100vh;

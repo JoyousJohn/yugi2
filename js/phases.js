@@ -89,7 +89,7 @@ async function computerTurn() {
     var currentHand = [...computer['monsters']]
     for (var m in currentHand) {
 
-        if (!getFreeZones('computer')) {
+        if (!getNumOfFreeZones('computer')) {
             console.log("computer has no free zones left, stopping summons")
             break;
         }
@@ -129,11 +129,18 @@ function getPhaseFormat() {
 
 function requestEndTurn() {
     if (turn === 0) {
+
         if (printMoves) print(getPhaseFormat() + " Player ends their turn")
+
+        if (activeCard) { // If active card is currently selected
+            $('.active-card').removeClass('active-card')
+            clearAvailableZones(); // Remove borders of zones that were available
+        }
+
         computerTurn();
-    } else {
-        alert('not your turn')
-    }
+
+    } else { alert('not your turn') }
+    
 }
 
 function prepareGame() {
@@ -164,18 +171,23 @@ function endGame() {
     player = null;
     computer = null;
 
-    // Clear & reset all fields
-    $('.card-zone-square').each(function() {
-        resetSquare(this);
-    })
+    if (activeCard) clearAvailableZones() // Remove borders of available zones if active card was currently selected
+
+    resetAllSquares()
+    
 }
 
-function resetSquare(squareElm) {
-    $(squareElm).find('div').removeData("flip-model") // Unitialize .flip
-    $(squareElm).attr('data-card-type', "")
-    $(squareElm).attr('data-card-name', "");
-    //$(this).removeAttr('style') // remove pos: relative added by .flip. Not doing this moves card to 0, 0 of viewport on moveCard
-    $(squareElm).find('img').removeAttr('src')
-    $(squareElm).find('.card-zone.main-zone').css('transform', '') // Remove def pos rotation
-    $(squareElm).find('.front, .back').removeAttr('style') // Remove many props added by .flip
+// Clear & reset all fields
+function resetAllSquares(squareElm) {
+
+    $('.card-zone-square').each(function() {
+        $(this).find('div').removeData("flip-model") // Unitialize .flip
+        $(this).attr('data-card-type', "")
+        $(this).attr('data-card-name', "");
+        //$(this).removeAttr('style') // remove pos: relative added by .flip. Not doing this moves card to 0, 0 of viewport on moveCard
+        $(this).find('img').removeAttr('src')
+        $(this).find('.card-zone.main-zone').css('transform', '') // Remove def pos rotation
+        $(this).find('.front, .back').removeAttr('style') // Remove many props added by .flip
+    })
+
 }

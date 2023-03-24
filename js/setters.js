@@ -42,6 +42,13 @@ function clearHand(who) {
     $('#' + who + '-hand').empty();
 }
 
+function clearAvailableZones() {
+    const availableSquares = getAvailableSquaresElms()
+    for (const square of availableSquares) {
+        square.find('div.card-zone.main-zone').removeClass('available-zone')
+    }
+}
+
 
 
 

@@ -22,9 +22,9 @@ function getFirstFreeZone(who) {
 }
 
 // (int) Return how many free zones left
-function getFreeZones(who) {
-    var freeZones = 0;
-    var field = getField(who)
+function getNumOfFreeZones(who) {
+    let freeZones = 0;
+    const field = getField(who)
     $(field).find('.card-zone-square').each(function() {
         var cardName = $(this).attr('data-card-name');
         if (cardName === "") {
@@ -34,7 +34,18 @@ function getFreeZones(who) {
     return freeZones;
 }
 
+function getAvailableSquaresElms() {
+    let freeZones = []
+    const field = getField('player')
+    $(field).find('.card-zone-square').each(function() {
+        if (isSquareEmpty($(this))) freeZones.push($(this))
+    })
+    return freeZones
+}
+
 // (boolean) Return if squareElm is empty
 function isSquareEmpty(squareElm) {
     return squareElm.attr('data-card-name') === ''
 }
+
+function isSummonOptionsVisible() { return $('#summon-options').is(':visible') }
