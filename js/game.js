@@ -33,32 +33,39 @@ function getCards(who, num) {
 
 function summonMonster(who, monsterName) {
 
-    const {isDefense, faceDown} = AICalcMonsterPosition(monsterName)
-    print(isDefense  + "   " + faceDown)
+    const {mode, faceDown} = AICalcMonsterPosition(monsterName)
+    print(mode  + "   " + faceDown)
 
     var firstFreeZone = getFirstFreeZone(who)
     if (printMoves) print(getPhaseFormat() + " " + who + " summons monster " + monsterName + " in zone #" + firstFreeZone)
 
-    addToFeed(who + " summons monster " + monsterName + " in zone #" + firstFreeZone)
-
     let source = getHandCardElm(who, monsterName); // make sure the sourcec doesn't have class "clone"
     var target = getSquareElm(who, firstFreeZone)
-    target.attr('isDefense', isDefense)
+    target.attr('mode', mode)
     target.attr('isFaceDown', faceDown)
-    moveCard('computer', source, target, isDefense, faceDown)
+    moveCard('computer', source, target, mode, faceDown)
 
     removeMonsterFromHandVar(who, monsterName)
 
 }
 
 // Move a card (from hand) to board position
-async function moveCard(who, source, targetSquare, isDefense, faceDown) {
+async function moveCard(who, source, targetSquare, mode, faceDown) {
 
-    source.attr('is-source-of-clone', true) // So the next getHandCardElm doesn't return the invisible (scale(0)) instead of next card in hand of the same monster
+    if (mode === 'attack') {
+        isDefense = false;
+    } else if (mode === 'defense') {
+        isDefense = true;
+    }
+    isAttack = !isDefense;
+
+    monsteRName = source.attr('data-card-name')
+    addToFeed(who + " summons monster " + monsteRName + " in zone #" + targetSquare.attr('data-zone') + ' in ' + mode + ' mode')
 
     const clone = source.clone();
-    clone.attr('is-moving-clone', true) // Not used for anything, just helper
-    
+    clone.attr('is-moving-clone', true) // Not used for anything, just debug helper
+    source.attr('is-source-of-clone', true) // So the next getHandCardElm doesn't return the invisible (scale(0)) instead of next card in hand of the same monster
+
     clone.css({ // Move clone to location of source
         position: 'absolute',
         margin: 0,
@@ -66,14 +73,15 @@ async function moveCard(who, source, targetSquare, isDefense, faceDown) {
         left: (source[0].offsetLeft)
     });
 
-    $(clone).appendTo(source.parent()) // Add new clone to hand of cards to immitate being moved from hand
+    clone.appendTo(source.parent()) // Add new clone to hand of cards to immitate being moved from hand
 
     source.css('transform', 'scale(0)') // Make source invisible. Can't remove since also removes clone.
-    let targetZone = targetSquare.find('div.card-zone') // Get the actual card loc in card-square
+
+    let targetZone = targetSquare.find('div.card-zone') // Get the actual card square inner zone location in card-square
 
     targetZone.flip({ // Init flip
         //'trigger': 'manual', // So isn't flipped on click
-        'speed': -1, // To show no animation if set in defense mode. 1 works too, not sure why not 0
+        //'speed': -1, // To show no animation if set in defense mode. 1 works too, not sure why not 0 // Is this even doing anything??
     })
 
     const faceUp = !faceDown
@@ -85,7 +93,7 @@ async function moveCard(who, source, targetSquare, isDefense, faceDown) {
         left: targetZone[0].offsetLeft,
         rotate: isDefense && '90deg' || '0', // Rotate sideways if is set in defense
         rotateX: 0 // Rotates perspective of card being held up. Only applies to computer currently as player is already 0. Check card.css. 
-    }, 1500, 'ease', async function() {
+    }, 1000, 'ease', function() { // removed async temporarily?
         clone.remove() 
         source.remove()
         updateCardImage(targetSquare)   
@@ -101,7 +109,7 @@ async function moveCard(who, source, targetSquare, isDefense, faceDown) {
             await sleep(100) // So updateFlipSpeed() animation below isn't visible
         }*/
         
-        updateFlipSpeed(targetZone, 500)  // newSpeed in ms
+        //updateFlipSpeed(targetZone, 500)  // Update how fast the card will be flipped after it's placed. newSpeed in ms.
         targetZone.show() // Unhide if hidden by setting card face-down - can add if visible condition later
 
     });
@@ -109,31 +117,32 @@ async function moveCard(who, source, targetSquare, isDefense, faceDown) {
     // Visually flip card over to being visible if computer placing card face-up
     // NOTE: .flip booleans are opposite for opponent!!!
     if (who === 'computer' && faceUp) { // face-up
-
-         // Hide target zone so defense animation isn't shown
+         
+        targetZone.hide() // Hide target zone so defense animation isn't shown
         targetZone.flip(false) // Set placed card-data to flipped face-down.
-        updateFlipSpeed(targetZone, 5000)
+        //updateFlipSpeed(targetZone, 5000)
+        addToFeed('flipping' + monsteRName)
+        //await sleep(100)
         clone.find('.card-front, .card-back').transition({
             rotateY: '+=180deg',
             perspective: '50px'
-        }, 500);
+        }, 800);
 
     } else if (who === 'computer' && faceDown) {
-        targetZone.hide()
         targetZone.flip(true)
     }
  
-    // Visually flip over moving card if being set face-down
+    // Visually flip over moving card if player setting face-down
     if (who === 'player' && faceDown) {
 
-        targetZone.hide() // Hide target zone so flip over animation isn't shown
+        targetZone.hide() // Hide target zone so flip over animation isn't shown - or is it to hide new card elm that's generated?
         targetZone.flip(true) // Set placed card-data to flipped face-down.
         //await sleep(100) // Without delay the flip above is visible <-- either this or .hide/.show would both work
-        updateFlipSpeed(targetZone, 500)
+        //updateFlipSpeed(targetZone, 500)
         clone.find('.card-front, .card-back').transition({
             rotateY: '+=180deg',
             perspective: '50px'
-        });
+        }, 800);
 
     } else if (who === 'player' && faceUp) {
         targetZone.flip(false)
@@ -144,7 +153,6 @@ async function moveCard(who, source, targetSquare, isDefense, faceDown) {
     var cardName = $(source).attr('data-card-name')
     $(targetSquare).attr('data-card-type', cardType)
     $(targetSquare).attr('data-card-name', cardName)
-
 }
 
 async function updateFlipSpeed(flipElm, newSpeed) {
@@ -230,7 +238,14 @@ function summonOptionSelected(position) {
 
 function addCardToHand(who, card) {
     var imgSrc = cards[card]['file'];
-    cardElm = '<div class="card" data-card-name="' + card + '"><div class="card-relative" style="position: relative;"><div class="card-front"><img class="card-img" src="cards/' + imgSrc + '"></div><div class="card-back"></div></div></div>'
+
+    if (who === 'player') { // Solves that really annoying computer moving a card that has to be flipped over bug. Apparently order of card face elm matters even though the divs have the right classes...
+        var faceOrder = '<div class="card-front"><img class="card-img" src="cards/' + imgSrc + '"></div><div class="card-back">'
+    } else if (who === 'computer') {
+        var faceOrder = '<div class="card-back"><div class="card-front"><img class="card-img" src="cards/' + imgSrc + '"></div>'
+    }
+
+    cardElm = '<div class="card" data-card-name="' + card + '"><div class="card-relative" style="position: relative;">' + faceOrder + '</div></div>'
     //cardElm = '<div class="card" data-card-name="' + card + '"><div class="card-relative" style="position: relative;"><div class="card-front"><img class="card-img" src="cards/' + imgSrc + '"></div></div></div>'
     //cardElm = '<div class="card" data-card-name="' + card + '"><div class="card-front"><img class="card-img" src="cards/' + imgSrc + '"></div></div>'
     $('#' + who + '-hand').append(cardElm);
