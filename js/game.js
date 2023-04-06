@@ -33,12 +33,19 @@ function getCards(who, num) {
 
 function summonMonster(who, monsterName) {
 
+    const {isDefense, faceDown} = AICalcMonsterPosition(monsterName)
+    print(isDefense  + "   " + faceDown)
+
     var firstFreeZone = getFirstFreeZone(who)
     if (printMoves) print(getPhaseFormat() + " " + who + " summons monster " + monsterName + " in zone #" + firstFreeZone)
 
+    addToFeed(who + " summons monster " + monsterName + " in zone #" + firstFreeZone)
+
     let source = getHandCardElm(who, monsterName); // make sure the sourcec doesn't have class "clone"
     var target = getSquareElm(who, firstFreeZone)
-    moveCard('computer', source, target)
+    target.attr('isDefense', isDefense)
+    target.attr('isFaceDown', faceDown)
+    moveCard('computer', source, target, isDefense, faceDown)
 
     removeMonsterFromHandVar(who, monsterName)
 
@@ -52,7 +59,7 @@ async function moveCard(who, source, targetSquare, isDefense, faceDown) {
     const clone = source.clone();
     clone.attr('is-moving-clone', true) // Not used for anything, just helper
     
-    clone.css({
+    clone.css({ // Move clone to location of source
         position: 'absolute',
         margin: 0,
         top: source[0].offsetTop,
@@ -65,9 +72,12 @@ async function moveCard(who, source, targetSquare, isDefense, faceDown) {
     let targetZone = targetSquare.find('div.card-zone') // Get the actual card loc in card-square
 
     targetZone.flip({ // Init flip
-        //'trigger': 'manual',
+        //'trigger': 'manual', // So isn't flipped on click
         'speed': -1, // To show no animation if set in defense mode. 1 works too, not sure why not 0
     })
+
+    const faceUp = !faceDown
+    if (isDefense) targetZone.css('transform', 'rotate(90deg)'); // Set target zone to sideways if in defense
 
     // Move the card
     clone.transition({ 
@@ -81,31 +91,52 @@ async function moveCard(who, source, targetSquare, isDefense, faceDown) {
         updateCardImage(targetSquare)   
 
         // Set flip status to flipped if placed by computer
-        if (who === 'computer') {     
-            targetZone.flip(true) // Set placed card-data to flipped face-down.
+        /*if (who === 'computer') { 
+            
+            if (faceDown) {
+                targetZone.flip(true) // Set placed card-data to flipped face-down.
+            } else {
+                targetZone.flip(false) // Set placed card-data to flipped face-down.
+            }
             await sleep(100) // So updateFlipSpeed() animation below isn't visible
-        }
+        }*/
         
         updateFlipSpeed(targetZone, 500)  // newSpeed in ms
-        targetZone.show() // Unhide if hidden by player setting card face-down - can add if visible condition later
+        targetZone.show() // Unhide if hidden by setting card face-down - can add if visible condition later
 
     });
+
+    // Visually flip card over to being visible if computer placing card face-up
+    // NOTE: .flip booleans are opposite for opponent!!!
+    if (who === 'computer' && faceUp) { // face-up
+
+         // Hide target zone so defense animation isn't shown
+        targetZone.flip(false) // Set placed card-data to flipped face-down.
+        updateFlipSpeed(targetZone, 5000)
+        clone.find('.card-front, .card-back').transition({
+            rotateY: '+=180deg',
+            perspective: '50px'
+        }, 500);
+
+    } else if (who === 'computer' && faceDown) {
+        targetZone.hide()
+        targetZone.flip(true)
+    }
  
-    // Visually flip over moving card if being set
+    // Visually flip over moving card if being set face-down
     if (who === 'player' && faceDown) {
 
-        targetZone.hide() // Hide target zone so defense animation isn't shown
+        targetZone.hide() // Hide target zone so flip over animation isn't shown
         targetZone.flip(true) // Set placed card-data to flipped face-down.
         //await sleep(100) // Without delay the flip above is visible <-- either this or .hide/.show would both work
         updateFlipSpeed(targetZone, 500)
-        print('set facedown')
         clone.find('.card-front, .card-back').transition({
             rotateY: '+=180deg',
             perspective: '50px'
         });
-    } else if (who === 'player') {
-        //targetZone.flip(false)
-        print('set to false')
+
+    } else if (who === 'player' && faceUp) {
+        targetZone.flip(false)
     }
 
     // Actually set the moved card in the DOM
@@ -175,7 +206,6 @@ function summonOptionSelected(position) {
 
     if (position === 'def-up' || position === 'def-down') {
         isDefense = true;
-        selectedSquare.find('div.card-zone.main-zone').css('transform', 'rotate(90deg)');
     } else {
         isDefense = false;
     }

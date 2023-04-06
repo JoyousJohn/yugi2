@@ -36,6 +36,11 @@ function getNumOfFreeZones(who) {
     return freeZones;
 }
 
+// (int) Return how many monsters are on who's field
+function getNumOfMonstersOnField(who) {
+    return 6 - getNumOfFreeZones(who)
+}
+
 function getAvailableSquaresElms() {
     let freeZones = []
     const field = getField('player')

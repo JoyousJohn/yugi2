@@ -47,7 +47,7 @@
 
 /* In-hand */
 #computer-hand div.card-front {
-    transform: rotateY(180deg);
+    transform: rotateY(-180deg);
 }
 
 #computer-hand > .card {

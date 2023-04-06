@@ -173,8 +173,11 @@ function endGame() {
 
     if (activeCard) clearAvailableZones() // Remove borders of available zones if active card was currently selected
 
-    resetAllSquares()
-    
+    resetAllSquares()   
+}
+
+function addToFeed(gameMove) {
+    $('#feed').text(gameMove + '\n\n' + $('#feed').text())
 }
 
 // Clear & reset all fields
