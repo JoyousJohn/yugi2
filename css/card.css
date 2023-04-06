@@ -41,15 +41,28 @@
     background-size: cover;
 }
 
-#player-field .card-back {
+/* In-hand */
+#player-hand .card-back { /* changed this from #player-field to #player-hand 4/4 2:28 AM*/ 
     transform: rotateY(180deg);
 }
 
-/* In-hand */
-#computer-hand div.card-front {
-    transform: rotateY(-180deg);
+#computer-hand .card-back { /* <-- this being .card-back instead of .card-front caused all the problems and took me 2 hrs to find wow */
+    transform: rotateY(180deg);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+/* Perspective-only */
 #computer-hand > .card {
     transform: rotateX(-50deg);
 }
