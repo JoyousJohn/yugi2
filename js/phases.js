@@ -166,6 +166,7 @@ function showPopup(text) {
 function endGame() {
     $('#viewport').hide();
     $('#homescreen').show(); 
+    $('#feed').text('');
     clearHand('player');
     clearHand('computer');
     player = null;
@@ -177,7 +178,8 @@ function endGame() {
 }
 
 function addToFeed(gameMove) {
-    $('#feed').text(gameMove + '\n\n' + $('#feed').text())
+    //$('#feed').text(gameMove + '\n\n' + $('#feed').text())
+    $('#feed').append(gameMove)
 }
 
 // Clear & reset all fields

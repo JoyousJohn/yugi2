@@ -5,15 +5,15 @@ function AICalcMonsterPosition(monsterName) {
     const def = cards[monsterName]['def']
 
     if (getNumOfMonstersOnField('computer') === 0) {
-        return {'isDefense': true, 'faceDown': true}; //'def-down'
+        return {'mode': 'defense', 'faceDown': true}; //'def-down'
     }
 
     if (def > atk) {
-        return {'isDefense': true, 'faceDown': false}; //'def-up'
+        return {'mode': 'defense', 'faceDown': false}; //'def-up'
     }
 
     if (atk >= def) {
-        return {'isDefense': false, 'faceDown': false}; //'atk'
+        return {'mode': 'attack', 'faceDown': false}; //'atk'
     }
 
 }

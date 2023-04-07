@@ -60,7 +60,7 @@ async function moveCard(who, source, targetSquare, mode, faceDown) {
     isAttack = !isDefense;
 
     monsteRName = source.attr('data-card-name')
-    addToFeed(who + " summons monster " + monsteRName + " in zone #" + targetSquare.attr('data-zone') + ' in ' + mode + ' mode')
+    addToFeed('(debug) ' + who + " summons <em>" + monsteRName + "</em> in zone #" + targetSquare.attr('data-zone') + ' in ' + mode + ' mode\n\n')
 
     const clone = source.clone();
     clone.attr('is-moving-clone', true) // Not used for anything, just debug helper
@@ -121,7 +121,6 @@ async function moveCard(who, source, targetSquare, mode, faceDown) {
         targetZone.hide() // Hide target zone so defense animation isn't shown
         targetZone.flip(false) // Set placed card-data to flipped face-down.
         //updateFlipSpeed(targetZone, 5000)
-        addToFeed('flipping' + monsteRName)
         //await sleep(100)
         clone.find('.card-front, .card-back').transition({
             rotateY: '+=180deg',
@@ -129,7 +128,8 @@ async function moveCard(who, source, targetSquare, mode, faceDown) {
         }, 800);
 
     } else if (who === 'computer' && faceDown) {
-        targetZone.flip(true)
+        targetZone.hide() // Don't show placed card (which is face-down) until moving card animation has finished
+        targetZone.flip(true) // Set status to flipped upside-down
     }
  
     // Visually flip over moving card if player setting face-down
@@ -184,6 +184,8 @@ $(document).on('click', '#player-hand > .card', function() {
 // Select card on player's grid (placing the card)
 $(document).on('click', '.player-field-grid div.card-zone-square', function() {
 
+    if (turn === 1) return; // Don't do anything if is computer's turn
+
     isAlreadySelected = selectedSquare && ($(this)).is(selectedSquare) // Is selected square already selected. Need to make sure selectedSquare is set first before comparing or else error.
 
     if (activeCard !== null && !isAlreadySelected && isSquareEmpty($(this))) { // Confirm an active card is selected and target square is available
@@ -208,17 +210,19 @@ function summonOptionSelected(position) {
 
     if (position === 'def-down') {
         faceDown = true;
-    } else {
+    } else if (position === 'atk' || position === 'def-up') {
         faceDown = false;
     }
 
     if (position === 'def-up' || position === 'def-down') {
         isDefense = true;
-    } else {
+        mode = 'defense'
+    } else if (position === 'atk') {
         isDefense = false;
+        mode = 'attack'
     }
 
-    moveCard('player', activeCard, selectedSquare, isDefense, faceDown) // source, target
+    moveCard('player', activeCard, selectedSquare, mode, faceDown) // source, target
     removeMonsterFromHandVar('player', activeCard.attr('data-card-name'))
 
     activeCard = null;

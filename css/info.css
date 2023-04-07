@@ -9,3 +9,11 @@
 #game-phase {
     font-family: A-Space Demo;
 }
+
+#feed {
+    font: 16rem Arial;
+}
+
+#feed > em {
+    color: rgb(255, 200, 0);
+}

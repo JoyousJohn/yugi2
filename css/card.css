@@ -42,11 +42,11 @@
 }
 
 /* In-hand */
-#player-hand .card-back { /* changed this from #player-field to #player-hand 4/4 2:28 AM*/ 
+#player-hand .card-back { /* Rotate the back of cards in-hand to be on the back side of card front image */
     transform: rotateY(180deg);
 }
 
-#computer-hand .card-back { /* <-- this being .card-back instead of .card-front caused all the problems and took me 2 hrs to find wow */
+#computer-hand .card-front { /* Rotate the front of cards in-hand to be on the back side of card front image */
     transform: rotateY(180deg);
 }
 
