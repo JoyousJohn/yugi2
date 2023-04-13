@@ -11,7 +11,7 @@ var printMoves = false;
 // Add n cards to player/computer's hand
 function getCards(who, num) {
 
-    var cardList = [];
+    let cardList = [];
 
     if (who === 'player') {
         cardList = deck;
@@ -21,11 +21,11 @@ function getCards(who, num) {
 
     for (var i = 0; i < num; i++) {
 
-        var card = random(cardList);
-        addCardToHand(who, card)
+        const cardName = random(cardList);
+        addCardToHand(who, cardName)
 
-        type = cards[card]['type']
-        window[who]['hand'][type].push(card)
+        const cardType = cards[cardName]['type']
+        window[who]['hand'][cardType].push(cardName)
     }
 
     if (printMoves) print(getPhaseFormat() + " " + who + " draws a card")
@@ -34,13 +34,12 @@ function getCards(who, num) {
 function summonMonster(who, monsterName) {
 
     const {mode, faceDown} = AICalcMonsterPosition(monsterName)
-    print(mode  + "   " + faceDown)
+    const firstFreeZone = getFirstFreeZone(who)
 
-    var firstFreeZone = getFirstFreeZone(who)
     if (printMoves) print(getPhaseFormat() + " " + who + " summons monster " + monsterName + " in zone #" + firstFreeZone)
 
-    let source = getHandCardElm(who, monsterName); // make sure the sourcec doesn't have class "clone"
-    var target = getSquareElm(who, firstFreeZone)
+    const source = getHandCardElm(who, monsterName); // make sure the sourcec doesn't have class "clone"
+    const target = getSquareElm(who, firstFreeZone)
     moveCard('computer', source, target, mode, faceDown)
 
     removeMonsterFromHandVar(who, monsterName)
@@ -50,6 +49,7 @@ function summonMonster(who, monsterName) {
 // Move a card (from hand) to board position
 async function moveCard(who, source, targetSquare, mode, faceDown) {
 
+    let isDefense;
     if (mode === 'attack') {
         isDefense = false;
     } else if (mode === 'defense') {
@@ -57,8 +57,16 @@ async function moveCard(who, source, targetSquare, mode, faceDown) {
     }
     const isAttack = !isDefense;
 
-    monsterName = source.attr('data-card-name')
-    addToFeed('(debug) ' + who + " summons <em>" + monsterName + "</em> in zone #" + targetSquare.attr('data-zone') + ' in ' + mode + ' mode\n\n')
+    let isPlayer, isComputer;
+    if (who === 'player') { 
+        isPlayer = true; isComputer = false;
+    } else if (who === 'computer') {
+        isPlayer = false; isComputer = true;
+    }
+
+    const cardName = $(source).attr('data-card-name')
+    const zoneNum = $(targetSquare).attr('data-zone')
+    addToFeed('(debug) ' + who + " summons <em>" + cardName + "</em> in zone #" + zoneNum + ' in ' + mode + ' mode\n\n')
 
     const clone = source.clone();
     clone.attr('is-moving-clone', true) // Not used for anything, just debug helper
@@ -82,8 +90,8 @@ async function moveCard(who, source, targetSquare, mode, faceDown) {
         //'speed': -1, // To show no animation if set in defense mode. 1 works too, not sure why not 0 // Is this even doing anything??
     })
 
-    const faceUp = !faceDown
-    if (isDefense) targetZone.css('transform', 'rotate(90deg)'); // Set target zone to sideways if in defense
+    // Set target zone to sideways if in defense
+    if (isDefense) targetZone.css('transform', 'rotate(90deg)'); 
 
     // Move the card
     clone.transition({ 
@@ -91,62 +99,68 @@ async function moveCard(who, source, targetSquare, mode, faceDown) {
         left: targetZone[0].offsetLeft,
         rotate: isDefense && '90deg' || '0', // Rotate sideways if is set in defense
         rotateX: 0 // Rotates perspective of card being held up. Only applies to computer currently as player is already 0. Check card.css. 
-    }, 1000, 'ease', function() { // removed async temporarily?
-        clone.remove() 
-        source.remove()
-        updateCardImage(targetSquare)   
-        
+    }, 1000, 'ease', function() {
+        clone.remove(); 
+        source.remove();
+        updateCardImage(targetSquare);  
         //updateFlipSpeed(targetZone, 500)  // Update how fast the card will be flipped after it's placed. newSpeed in ms.
-        targetZone.show() // Unhide if hidden by setting card face-down - can add if visible condition later
-
+        targetZone.show(); // Unhide if hidden by setting card face-down - can add if visible condition later
     });
 
-    // Visually flip card over to being visible if computer placing card face-up
-    // NOTE: .flip booleans are opposite for opponent!!!
-    if (who === 'computer' && faceUp) { // face-up
+    const faceUp = !faceDown;
+
+    if (isComputer && faceUp) {
          
-        targetZone.hide() // Hide target zone so defense animation isn't shown
-        targetZone.flip(false) // Set placed card-data to flipped face-down.
+        targetZone.hide(); // Hide target zone so defense animation isn't shown
+        zoneFlippedUp(true); // Set placed card-data to flipped face-up.
         //updateFlipSpeed(targetZone, 5000)
         //await sleep(100)
-        clone.find('.card-front, .card-back').transition({
-            rotateY: '+=180deg',
-            perspective: '50px'
-        }, 800);
+        cloneFlipYAnimation(); // Flip face-down card from opponent hand to face-up
 
-    } else if (who === 'computer' && faceDown) {
-        targetZone.hide() // Don't show placed card (which is face-down) until moving card animation has finished
-        targetZone.flip(true) // Set status to flipped upside-down
+    } else if (isComputer && faceDown) {
+        targetZone.hide(); // Don't show placed card (which is face-down) until moving card animation has finished
+        zoneFlippedUp(false); // Set status to flipped face-down
     }
  
     // Visually flip over moving card if player setting face-down
-    if (who === 'player' && faceDown) {
+    if (isPlayer && faceDown) {
 
         targetZone.hide() // Hide target zone so flip over animation isn't shown - or is it to hide new card elm that's generated?
-        targetZone.flip(true) // Set placed card-data to flipped face-down.
+        zoneFlippedUp(false) // Set placed card-data to flipped face-down.
         //await sleep(100) // Without delay the flip above is visible <-- either this or .hide/.show would both work
         //updateFlipSpeed(targetZone, 500)
+        cloneFlipYAnimation() // Flip face-up card from opponent hand to face-down
+
+    } else if (isPlayer && faceUp) {
+        // Note: don't need to targetZone.hide() since card already face-up and visible
+        zoneFlippedUp(true)
+    }
+
+    // Set jquery.flip status
+    function zoneFlippedUp(flippedUp) {
+        targetZone.flip(!flippedUp) // Opposite since jquery.flip is if card is flipped down
+        // print(monsterName + ' .flip status set to: ' + !flippedUp)
+    }
+
+    // Spin the card around if being flipped opposite face
+    function cloneFlipYAnimation() {
         clone.find('.card-front, .card-back').transition({
             rotateY: '+=180deg',
             perspective: '50px'
         }, 800);
-
-    } else if (who === 'player' && faceUp) {
-        targetZone.flip(false)
     }
 
     // Actually set the moved card in the DOM
     const cardType = $(source).attr('data-card-type')
-    const cardName = $(source).attr('data-card-name')
     $(targetSquare).attr('data-card-type', cardType)
     $(targetSquare).attr('data-card-name', cardName)
     $(targetSquare).attr('data-card-position', mode)
 
     // Add card to global field var
-    const zoneNum = $(targetSquare).attr('data-zone')
     window[who]['field'][cardType].push({'zone': zoneNum, 'cardName': cardName, 'cardType': cardType})
 }
 
+// Only affects element if 'speed' field was changed in .flip init, i.e. if was set to -1, or 1, so .flip status can be set with no animation
 async function updateFlipSpeed(flipElm, newSpeed) {
     flipElm = $(flipElm)
     flipElm.data('flip-model').setting.speed = 500; // Not sure if affects anything
