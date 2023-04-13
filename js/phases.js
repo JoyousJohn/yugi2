@@ -86,7 +86,7 @@ async function computerTurn() {
 
     setPhase(2) // Main Phase 1
 
-    var currentHand = [...computer['monsters']]
+    var currentHand = [...computer['hand']['monsters']]
     for (var m in currentHand) {
 
         if (!getNumOfFreeZones('computer')) {
@@ -147,8 +147,14 @@ function prepareGame() {
     $('#homescreen').hide(); 
     $('#summon-options').hide();
     $('#viewport').show();
-    player = { 'monsters': [], 'spells': [], 'traps': []}
-    computer = { 'monsters': [], 'spells': [], 'traps': []}
+    player = { 
+        'hand': { 'monsters': [], 'spells': [], 'traps': []},
+        'field': { 'monsters': [], 'spells': [], 'traps': []}
+    }
+    computer = { 
+        'hand': { 'monsters': [], 'spells': [], 'traps': []},
+        'field': { 'monsters': [], 'spells': [], 'traps': []}
+    }
     buildPlayerDeck()
 }
 

@@ -1,7 +1,7 @@
 var deck;
 
-var player;
-var computer;
+var player = {'hand': [], 'field': []};
+var computer = {'hand': [], 'field': []};
 
 var activeCard;
 var selectedSquare;
@@ -25,7 +25,7 @@ function getCards(who, num) {
         addCardToHand(who, card)
 
         type = cards[card]['type']
-        window[who][type].push(card)
+        window[who]['hand'][type].push(card)
     }
 
     if (printMoves) print(getPhaseFormat() + " " + who + " draws a card")
@@ -41,8 +41,6 @@ function summonMonster(who, monsterName) {
 
     let source = getHandCardElm(who, monsterName); // make sure the sourcec doesn't have class "clone"
     var target = getSquareElm(who, firstFreeZone)
-    target.attr('mode', mode)
-    target.attr('isFaceDown', faceDown)
     moveCard('computer', source, target, mode, faceDown)
 
     removeMonsterFromHandVar(who, monsterName)
@@ -57,10 +55,10 @@ async function moveCard(who, source, targetSquare, mode, faceDown) {
     } else if (mode === 'defense') {
         isDefense = true;
     }
-    isAttack = !isDefense;
+    const isAttack = !isDefense;
 
-    monsteRName = source.attr('data-card-name')
-    addToFeed('(debug) ' + who + " summons <em>" + monsteRName + "</em> in zone #" + targetSquare.attr('data-zone') + ' in ' + mode + ' mode\n\n')
+    monsterName = source.attr('data-card-name')
+    addToFeed('(debug) ' + who + " summons <em>" + monsterName + "</em> in zone #" + targetSquare.attr('data-zone') + ' in ' + mode + ' mode\n\n')
 
     const clone = source.clone();
     clone.attr('is-moving-clone', true) // Not used for anything, just debug helper
@@ -97,17 +95,6 @@ async function moveCard(who, source, targetSquare, mode, faceDown) {
         clone.remove() 
         source.remove()
         updateCardImage(targetSquare)   
-
-        // Set flip status to flipped if placed by computer
-        /*if (who === 'computer') { 
-            
-            if (faceDown) {
-                targetZone.flip(true) // Set placed card-data to flipped face-down.
-            } else {
-                targetZone.flip(false) // Set placed card-data to flipped face-down.
-            }
-            await sleep(100) // So updateFlipSpeed() animation below isn't visible
-        }*/
         
         //updateFlipSpeed(targetZone, 500)  // Update how fast the card will be flipped after it's placed. newSpeed in ms.
         targetZone.show() // Unhide if hidden by setting card face-down - can add if visible condition later
@@ -149,10 +136,15 @@ async function moveCard(who, source, targetSquare, mode, faceDown) {
     }
 
     // Actually set the moved card in the DOM
-    var cardType = $(source).attr('data-card-type')
-    var cardName = $(source).attr('data-card-name')
+    const cardType = $(source).attr('data-card-type')
+    const cardName = $(source).attr('data-card-name')
     $(targetSquare).attr('data-card-type', cardType)
     $(targetSquare).attr('data-card-name', cardName)
+    $(targetSquare).attr('data-card-position', mode)
+
+    // Add card to global field var
+    const zoneNum = $(targetSquare).attr('data-zone')
+    window[who]['field'][cardType].push({'zone': zoneNum, 'cardName': cardName, 'cardType': cardType})
 }
 
 async function updateFlipSpeed(flipElm, newSpeed) {
@@ -241,7 +233,11 @@ function summonOptionSelected(position) {
 
 
 function addCardToHand(who, card) {
+
+    console.log(card)
+
     var imgSrc = cards[card]['file'];
+    var type = cards[card]['type']
 
     if (who === 'player') { // Solves that really annoying computer moving a card that has to be flipped over bug. Apparently order of card face elm matters even though the divs have the right classes...
         var faceOrder = '<div class="card-front"><img class="card-img" src="cards/' + imgSrc + '"></div><div class="card-back">'
@@ -249,7 +245,8 @@ function addCardToHand(who, card) {
         var faceOrder = '<div class="card-back"><div class="card-front"><img class="card-img" src="cards/' + imgSrc + '"></div>'
     }
 
-    cardElm = '<div class="card" data-card-name="' + card + '"><div class="card-relative" style="position: relative;">' + faceOrder + '</div></div>'
+    cardElm = '<div class="card" data-card-name="' + card + '" data-card-type="' + type + '"><div class="card-relative" style="position: relative;">' + faceOrder + '</div></div>'
+
     //cardElm = '<div class="card" data-card-name="' + card + '"><div class="card-relative" style="position: relative;"><div class="card-front"><img class="card-img" src="cards/' + imgSrc + '"></div></div></div>'
     //cardElm = '<div class="card" data-card-name="' + card + '"><div class="card-front"><img class="card-img" src="cards/' + imgSrc + '"></div></div>'
     $('#' + who + '-hand').append(cardElm);

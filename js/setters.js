@@ -29,7 +29,7 @@ function buildPlayerDeck() {
 // Remove monster string from who.monsters array
 function removeMonsterFromHandVar(who, monsterName) {
     if (printMoves) print("Removing " + monsterName + " from " + who + "'s hand")
-    window[who]['monsters'] = remove(window[who]['monsters'], monsterName)
+    window[who]['hand']['monsters'] = remove(window[who]['hand']['monsters'], monsterName)
     //getHand(who).find('div[data-card-name="' + monsterName + '"]').fadeOut();
 }
 

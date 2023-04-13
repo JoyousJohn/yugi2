@@ -29,7 +29,7 @@ function getNumOfFreeZones(who) {
     const field = getField(who)
     $(field).find('.card-zone-square').each(function() {
         var cardName = $(this).attr('data-card-name');
-        if (cardName === "") {
+        if (cardName === '') {
             freeZones++;   
         }
     })
@@ -39,6 +39,24 @@ function getNumOfFreeZones(who) {
 // (int) Return how many monsters are on who's field
 function getNumOfMonstersOnField(who) {
     return 6 - getNumOfFreeZones(who)
+}
+
+// (int) Return number of defense position monsters on who's field
+function getNumOfDefPosMonstersOnField(who) {
+    let defenseMonsters = 0;
+    const field = window[who]['field']
+    print(field)
+
+
+    $(field).find('.card-zone-square').each(function() {
+        var cardType = $(this).attr('data-card-type');
+        var mode = $(this).attr('data-card-position');
+        print(cardType + mode)
+        if (cardType === 'monsters' && mode === 'defense') {
+            defenseMonsters++;   
+        }
+    })
+    return defenseMonsters;
 }
 
 function getAvailableSquaresElms() {
