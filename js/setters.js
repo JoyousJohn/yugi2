@@ -49,8 +49,27 @@ function clearAvailableZones() {
     }
 }
 
+// Highlight available zones where cards can be placed on player field
+function showAvailableZones() {
+    const availableSquares = getAvailableSquaresElms()
+    for (const square of availableSquares) {
+        square.find('div.card-zone.main-zone').addClass('available-zone')
+    }   
+}
 
+function hideSummonOptionsIfVisible() {
+    if (isSummonOptionsVisible()) $('#summon-options').hide();
+}
 
+// Hide the position change buttons that show up when clicking placed monster
+function hidePositionChangeOptionsIfVisible() {
+    if (isPositionChangeOptionsVisible()) $('#change-position-options').hide();
+}
+
+// Remove CSS from active caard
+function resetActiveCardClass() {
+    $('.active-card').removeClass('active-card') 
+}
 
 
 

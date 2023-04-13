@@ -63,6 +63,8 @@
     
     <div id="viewport" style="display: none;">
 
+        <div id="opponent-lp">5000</div>
+
         <div id="turn-popup" style="display: none;"><span></span></div>
 
         <div id="summon-options">
@@ -73,6 +75,12 @@
         
         </div>
 
+        <div id="change-position-options">
+            <button class="position-option" onclick="changePositionOptionSelected('atk')">Face-up attack</button>
+            <button class="position-option" onclick="changePositionOptionSelected('def-up')">Face-up defense</button>
+            <button class="position-option" onclick="changePositionOptionSelected('def-down')">Face-down defense</button>
+        </div>
+
         <div id="info-panel">
 
             <div id="info-stats">
@@ -80,6 +88,8 @@
                 <p id="game-phase"></p>
 
                 <p id="turn-info"></p>
+
+                <p id="turn-count"></p>
 
             </div>
 
@@ -90,7 +100,7 @@
             </div>
 
             <div id="btn-panel">
-                <button onclick="getCards('player', 1);">Add to hand</button><br>
+                <!-- <button onclick="getCards('player', 1);">Add to hand</button><br> -->
                 <button onclick="requestEndTurn();">End turn</button><br>
                 <button onclick="endGame();">END GAME</button>
             </div>  
@@ -99,186 +109,191 @@
 
         </div>
 
-        <div id="mat">
+        <div id="mat-wrapper" style="position: relative;"> <!-- So player-lp can be attatched to bottom left -->
 
-            <!-- COMPUTER -->
-            <div id="computer-field" style="display: auto">
+            <div id="player-lp">5000</div>
 
-                <div id="row-wrapper">
+            <div id="mat">
 
-                    <div id="computer-deck-zone" class="card-zone">DECK</div>
+                <!-- COMPUTER -->
+                <div id="computer-field" style="display: auto">
 
-                    <div id="computer-hand">
+                    <div id="row-wrapper">
 
-                    </div>
+                        <div id="computer-deck-zone" class="card-zone">DECK</div>
 
-                    <div id="computer-graveyard-zone" class="card-zone">GRAVEYARD</div>
-                       
-                </div> 
+                        <div id="computer-hand">
 
-                <div id="field-grid-wrapper">
+                        </div>
 
-                    <div class="field-grid">
+                        <div id="computer-graveyard-zone" class="card-zone">GRAVEYARD</div>
                         
-                        <div class="card-zone field-zone">FIELD ZONE</div>
+                    </div> 
 
-                        <div class="card-zone-square" data-zone="1" data-card-type data-card-name>
-                            <div class="card-zone main-zone">
-                                <div class="front">
-                                    <img>
-                                </div>
-                                <div class="back">
+                    <div id="field-grid-wrapper">
+
+                        <div class="field-grid">
+                            
+                            <div class="card-zone field-zone">FIELD ZONE</div>
+
+                            <div class="card-zone-square" data-zone="1" data-card-type data-card-name>
+                                <div class="card-zone main-zone">
+                                    <div class="front">
+                                        <img>
+                                    </div>
+                                    <div class="back">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="card-zone-square" data-zone="2" data-card-type data-card-name>
-                            <div class="card-zone main-zone">
-                                <div class="front">
-                                    <img>
-                                </div>
-                                <div class="back">
+                            <div class="card-zone-square" data-zone="2" data-card-type data-card-name>
+                                <div class="card-zone main-zone">
+                                    <div class="front">
+                                        <img>
+                                    </div>
+                                    <div class="back">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="card-zone-square" data-zone="3" data-card-type data-card-name>
-                            <div class="card-zone main-zone">
-                                <div class="front">
-                                    <img>
-                                </div>
-                                <div class="back">
+                            <div class="card-zone-square" data-zone="3" data-card-type data-card-name>
+                                <div class="card-zone main-zone">
+                                    <div class="front">
+                                        <img>
+                                    </div>
+                                    <div class="back">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="card-zone-square" data-zone="4" data-card-type data-card-name>
-                            <div class="card-zone main-zone">
-                                <div class="front">
-                                    <img>
-                                </div>
-                                <div class="back">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-zone-square" data-zone="5" data-card-type data-card-name>
-                            <div class="card-zone main-zone">
-                                <div class="front">
-                                    <img>
-                                </div>
-                                <div class="back">
+                            
+                            <div class="card-zone-square" data-zone="4" data-card-type data-card-name>
+                                <div class="card-zone main-zone">
+                                    <div class="front">
+                                        <img>
+                                    </div>
+                                    <div class="back">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="card-zone-square" data-zone="6" data-card-type data-card-name>
-                            <div class="card-zone main-zone">
-                                <div class="front">
-                                    <img>
-                                </div>
-                                <div class="back">
+                            <div class="card-zone-square" data-zone="5" data-card-type data-card-name>
+                                <div class="card-zone main-zone">
+                                    <div class="front">
+                                        <img>
+                                    </div>
+                                    <div class="back">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-            
-                    </div>
 
-                </div> 
-
-            </div>
-
-            <!-- PLAYER -->
-            <div id="player-field">
-
-                <div id="field-grid-wrapper">
-
-                    <div class="field-grid player-field-grid">
-
-                        <div class="card-zone field-zone">FIELD ZONE</div>      
-                        
-                        <div class="card-zone-square" data-zone="1" data-card-type data-card-name>
-                            <div class="card-zone main-zone">
-                                <div class="front">
-                                    <img>
-                                </div>
-                                <div class="back">
+                            <div class="card-zone-square" data-zone="6" data-card-type data-card-name>
+                                <div class="card-zone main-zone">
+                                    <div class="front">
+                                        <img>
+                                    </div>
+                                    <div class="back">
+                                    </div>
                                 </div>
                             </div>
+                
                         </div>
 
-                        <div class="card-zone-square" data-zone="2" data-card-type data-card-name>
-                            <div class="card-zone main-zone">
-                                <div class="front">
-                                    <img>
-                                </div>
-                                <div class="back">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-zone-square" data-zone="3" data-card-type data-card-name>
-                            <div class="card-zone main-zone">
-                                <div class="front">
-                                    <img>
-                                </div>
-                                <div class="back">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="card-zone-square" data-zone="4" data-card-type data-card-name>
-                            <div class="card-zone main-zone">
-                                <div class="front">
-                                    <img>
-                                </div>
-                                <div class="back">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-zone-square" data-zone="5" data-card-type data-card-name>
-                            <div class="card-zone main-zone">
-                                <div class="front">
-                                    <img>
-                                </div>
-                                <div class="back">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-zone-square" data-zone="6" data-card-type data-card-name>
-                            <div class="card-zone main-zone">
-                                <div class="front">
-                                    <img>
-                                </div>
-                                <div class="back">
-                                </div>
-                            </div>
-                        </div>
-                        
-                    </div>
+                    </div> 
 
                 </div>
 
-                <div id="row-wrapper">
+                <!-- PLAYER -->
+                <div id="player-field">
 
-                    <div id="player-deck-zone" class="card-zone">DECK</div>
+                    <div id="field-grid-wrapper">
 
-                    <div id="player-hand">
+                        <div class="field-grid player-field-grid">
+
+                            <div class="card-zone field-zone">FIELD ZONE</div>      
+                            
+                            <div class="card-zone-square" data-zone="1" data-card-type data-card-name>
+                                <div class="card-zone main-zone">
+                                    <div class="front">
+                                        <img>
+                                    </div>
+                                    <div class="back">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-zone-square" data-zone="2" data-card-type data-card-name>
+                                <div class="card-zone main-zone">
+                                    <div class="front">
+                                        <img>
+                                    </div>
+                                    <div class="back">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-zone-square" data-zone="3" data-card-type data-card-name>
+                                <div class="card-zone main-zone">
+                                    <div class="front">
+                                        <img>
+                                    </div>
+                                    <div class="back">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card-zone-square" data-zone="4" data-card-type data-card-name>
+                                <div class="card-zone main-zone">
+                                    <div class="front">
+                                        <img>
+                                    </div>
+                                    <div class="back">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-zone-square" data-zone="5" data-card-type data-card-name>
+                                <div class="card-zone main-zone">
+                                    <div class="front">
+                                        <img>
+                                    </div>
+                                    <div class="back">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-zone-square" data-zone="6" data-card-type data-card-name>
+                                <div class="card-zone main-zone">
+                                    <div class="front">
+                                        <img>
+                                    </div>
+                                    <div class="back">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
 
                     </div>
 
-                    <div id="player-graveyard-zone" class="card-zone">GRAVEYARD</div>
-                       
-                </div>    
+                    <div id="row-wrapper">
+
+                        <div id="player-deck-zone" class="card-zone">DECK</div>
+
+                        <div id="player-hand">
+
+                        </div>
+
+                        <div id="player-graveyard-zone" class="card-zone">GRAVEYARD</div>
+                        
+                    </div>    
+
+                </div>
 
             </div>
 
         </div>
-    </div>
 
-    
+    </div>  
 
 </body>
 

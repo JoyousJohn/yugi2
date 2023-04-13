@@ -3,7 +3,7 @@ var deck;
 var player = {'hand': [], 'field': []};
 var computer = {'hand': [], 'field': []};
 
-var activeCard;
+var activeCard = null; // So showAvailableZones isn't called in playerTurn Main Phase 1
 var selectedSquare;
 
 var printMoves = false;
@@ -86,7 +86,7 @@ async function moveCard(who, source, targetSquare, mode, faceDown) {
     let targetZone = targetSquare.find('div.card-zone') // Get the actual card square inner zone location in card-square
 
     targetZone.flip({ // Init flip
-        //'trigger': 'manual', // So isn't flipped on click
+        'trigger': 'manual', // So isn't flipped on click
         //'speed': -1, // To show no animation if set in defense mode. 1 works too, not sure why not 0 // Is this even doing anything??
     })
 
@@ -155,6 +155,7 @@ async function moveCard(who, source, targetSquare, mode, faceDown) {
     $(targetSquare).attr('data-card-type', cardType)
     $(targetSquare).attr('data-card-name', cardName)
     $(targetSquare).attr('data-card-position', mode)
+    $(targetSquare).attr('data-turn-moved', turnCount)
 
     // Add card to global field var
     window[who]['field'][cardType].push({'zone': zoneNum, 'cardName': cardName, 'cardType': cardType})
@@ -170,38 +171,71 @@ async function updateFlipSpeed(flipElm, newSpeed) {
 // Select some card in player's hand
 $(document).on('click', '#player-hand > .card', function() {
 
+    // If active card is selected then unselect
+    if ($(this).is(activeCard)) {
+        $('.active-card').removeClass('active-card');
+        activeCard = null;
+        hideSummonOptionsIfVisible();
+        hidePositionChangeOptionsIfVisible();
+        clearAvailableZones(); // Remove borders from available zones to place cards
+        return; // Don't run code below
+    }
+
+    // Remove old active card
     if (activeCard !== null) {
-        $('.active-card').removeClass('active-card')
-        if (isSummonOptionsVisible()) $('#summon-options').hide(); // Hide summon options if visible. Should only be visible if active card selected...
+        $('.active-card').removeClass('active-card');
+        hideSummonOptionsIfVisible(); // Hide summon options if visible. Should only be visible if active card selected...
+        hidePositionChangeOptionsIfVisible(); // Hide position change options if visible. Should only be visible if active card selected...
     }
 
     activeCard = $(this); // Set new activeCard var
-
     $(this).addClass('active-card')
 
-    const availableSquares = getAvailableSquaresElms()
+    if (turn === 0) { // If player's turn then show all available squares where card can be summoned
 
-    for (const square of availableSquares) {
-        square.find('div.card-zone.main-zone').addClass('available-zone')
+        showAvailableZones();
+
     }
 
 })
 
-// Select card on player's grid (placing the card)
+// Select card on player's grid 
+// 1) To place an active card 
+// 2) Change position of placed monster 
+// 3) eventually to activate traps/spells too
 $(document).on('click', '.player-field-grid div.card-zone-square', function() {
 
     if (turn === 1) return; // Don't do anything if is computer's turn
 
-    isAlreadySelected = selectedSquare && ($(this)).is(selectedSquare) // Is selected square already selected. Need to make sure selectedSquare is set first before comparing or else error.
+    isAlreadySelected = selectedSquare && ($(this)).is(selectedSquare) // If selected square already selected. Need to make sure selectedSquare is set first before comparing or else error.
 
-    if (activeCard !== null && !isAlreadySelected && isSquareEmpty($(this))) { // Confirm an active card is selected and target square is available
+    // Click on field (square) zone to summon active card.
+    // Confirm an active card is selected, selected square wasn't already selected (don't show summon menu twice), and target square is empty/available
+    if (activeCard !== null && !isAlreadySelected && isSquareEmpty($(this))) { 
 
         // Probably a temp menu
-        selectedSquare = $(this);
+        selectedSquare = $(this); // Sets global var
         summonOptions = $('#summon-options')
-        summonOptions.show();
+        summonOptions.show(); // Show summon menu (temp)
         summonOptions.css('top', $(this).offset().top)
         summonOptions.css('left', $(this).offset().left)
+        return;
+
+    }
+
+    // Select card that was already placed, i.e. to change its position during main phase
+    // Confirm athere's a card in the square and card wasn't placed this turn <-- ONLY APPLIES TO MONSTERS CHANGE THIS LATER (check that monster type is monster below and then check if turn count isn't the same as when monster was summoned)
+    if (!isSquareEmpty($(this)) && $(this).attr('data-turn-moved') != turnCount) {
+
+        resetActiveCardClass()
+        activeCard = $(this);
+        
+        $(this).find('div.card-zone.main-zone').addClass('active-card') // Add fancy selected border
+        positionOptions = $('#change-position-options')
+        positionOptions.show()
+        positionOptions.css('top', $(this).offset().top)
+        positionOptions.css('left', $(this).offset().left)
+        return;
 
     }
 
@@ -209,7 +243,7 @@ $(document).on('click', '.player-field-grid div.card-zone-square', function() {
 
 function summonOptionSelected(position) {
 
-    $('.active-card').removeClass('active-card') // Remove css from active caard
+    resetActiveCardClass(); // Remove css from active card
     $('#summon-options').hide(); // Remove summon options button menu
     
     clearAvailableZones() // Do this before moving card since getAvailableSquaresElms() wouldn't return target zone then

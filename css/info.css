@@ -6,13 +6,12 @@
     width: 25%;
 }
 
-#game-phase {
-    font-family: A-Space Demo;
+#info-stats > p {
     margin: 0;
 }
 
-#turn-info {
-    margin: 0;
+#game-phase {
+    font-family: A-Space Demo;
 }
 
 #preview-card-img {
@@ -25,4 +24,20 @@
 
 #feed > em {
     color: rgb(255, 200, 0);
+}
+
+#opponent-lp {
+    font: 48rem A-Space Demo;
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 1; /* Show lp over graveyard */
+}
+
+#player-lp {
+    font: 48rem A-Space Demo;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 1; /* Show lp over deck */
 }

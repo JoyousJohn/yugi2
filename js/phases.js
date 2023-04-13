@@ -1,5 +1,6 @@
 var phase;
 var turn;
+var turnCount = 0;
 
 var phases = [
 
@@ -68,6 +69,10 @@ function playerTurn() {
     setPhase(1) // Standby
 
     setPhase(2) // Main Phase 1
+
+    if (activeCard !== null) {
+        showAvailableZones()
+    }
     
 }
 
@@ -117,6 +122,8 @@ function updateTurn(newTurn) {
     turn = newTurn
     turn ? print("Turn set to 1 (computer's)") : print("Turn set to 0 (player's)")
     turn ? $('#turn-info').text("computer's turn") : $('#turn-info').text("Your turn") 
+    turnCount++;
+    $('#turn-count').text('turnCount: ' + turnCount);
 } 
 
 function updatePhaseInfo() {
@@ -146,16 +153,20 @@ function requestEndTurn() {
 function prepareGame() {
     $('#homescreen').hide(); 
     $('#summon-options').hide();
+    $('#change-position-options').hide();
     $('#viewport').show();
     player = { 
         'hand': { 'monsters': [], 'spells': [], 'traps': []},
-        'field': { 'monsters': [], 'spells': [], 'traps': []}
+        'field': { 'monsters': [], 'spells': [], 'traps': []},
+        'graveyard': { 'monsters': [], 'spells': [], 'traps': []}
     }
     computer = { 
         'hand': { 'monsters': [], 'spells': [], 'traps': []},
-        'field': { 'monsters': [], 'spells': [], 'traps': []}
+        'field': { 'monsters': [], 'spells': [], 'traps': []},
+        'graveyard': { 'monsters': [], 'spells': [], 'traps': []}
     }
     buildPlayerDeck()
+    //$('#player-lp').css('left', $('#info-panel').outerWidth(true) + 'px') // true to include margin and padding in calculation
 }
 
 function setPhase(newPhase) {
@@ -178,7 +189,10 @@ function endGame() {
     player = null;
     computer = null;
 
-    if (activeCard) clearAvailableZones() // Remove borders of available zones if active card was currently selected
+    if (activeCard) {
+        clearAvailableZones(); // Remove borders of available zones if active card was currently selected
+        activeCard = null;
+    }
 
     resetAllSquares()   
 }

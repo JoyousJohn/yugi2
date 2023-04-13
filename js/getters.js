@@ -74,3 +74,5 @@ function isSquareEmpty(squareElm) {
 }
 
 function isSummonOptionsVisible() { return $('#summon-options').is(':visible') }
+
+function isPositionChangeOptionsVisible() { return $('#change-position-options').is(':visible') }

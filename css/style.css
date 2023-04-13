@@ -14,7 +14,7 @@
     overflow-y: hidden;
 }
 
-#summon-options {
+#summon-options, #change-position-options {
     display: flex; 
     flex-direction: column;
     position: fixed; 
@@ -23,6 +23,7 @@
 
 #mat {
     width: 85%;
+    height: 100%; /* To fill relative parent */
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
