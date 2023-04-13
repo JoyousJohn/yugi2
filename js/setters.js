@@ -66,6 +66,13 @@ function hidePositionChangeOptionsIfVisible() {
     if (isPositionChangeOptionsVisible()) $('#change-position-options').hide();
 }
 
+function showAllPositionChanges() {
+    $('#change-position-options button').each(function() {
+        console.log($(this))
+        if ($(this).is(':hidden')) $(this).show(); // Show any change position options that were hidden when showing valid position changes
+    })
+}
+
 // Remove CSS from active caard
 function resetActiveCardClass() {
     $('.active-card').removeClass('active-card') 

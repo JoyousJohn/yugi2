@@ -8,15 +8,13 @@ $(document).on('mouseenter', '.card-zone-square, .card',
         if (hoverCardName || !$(this).attr('data-card-name')) { return; } // Don't do anything if card already selected
 
         hoverCardName = $(this).attr('data-card-name')
-        console.log(hoverCardName)
 
         const cardImgURL = 'cards/' + cards[hoverCardName]['file']
-        console.log(cardImgURL)
 
         //$('#preview-card').css('background-image', 'url(' + cardImgURL + ')')
         $('#preview-card-img').attr('src', cardImgURL)
 
-        console.log('Set preview-card to ' + cardImgURL)
+        //console.log('Set preview-card to ' + cardImgURL)
 
     }
 

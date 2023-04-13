@@ -188,6 +188,7 @@ function endGame() {
     clearHand('computer');
     player = null;
     computer = null;
+    turnCount = 0;
 
     if (activeCard) {
         clearAvailableZones(); // Remove borders of available zones if active card was currently selected

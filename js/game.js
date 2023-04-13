@@ -33,29 +33,34 @@ function getCards(who, num) {
 
 function summonMonster(who, monsterName) {
 
-    const {mode, faceDown} = AICalcMonsterPosition(monsterName)
+    const mode = AICalcMonsterPosition(monsterName)
     const firstFreeZone = getFirstFreeZone(who)
 
     if (printMoves) print(getPhaseFormat() + " " + who + " summons monster " + monsterName + " in zone #" + firstFreeZone)
 
     const source = getHandCardElm(who, monsterName); // make sure the sourcec doesn't have class "clone"
     const target = getSquareElm(who, firstFreeZone)
-    moveCard('computer', source, target, mode, faceDown)
+    moveCard('computer', source, target, mode)
 
     removeMonsterFromHandVar(who, monsterName)
 
 }
 
 // Move a card (from hand) to board position
-async function moveCard(who, source, targetSquare, mode, faceDown) {
+async function moveCard(who, source, targetSquare, mode) {
 
-    let isDefense;
+    let isDefense, faceDown;
     if (mode === 'attack') {
         isDefense = false;
-    } else if (mode === 'defense') {
+    } else if (mode === 'defense-down') {
         isDefense = true;
+        faceDown = true;
+    } else if (mode === 'defense-up') {
+        isDefense = true;
+        faceDown = false;
     }
-    const isAttack = !isDefense;
+    //const isAttack = !isDefense;
+    const faceUp = !faceDown;
 
     let isPlayer, isComputer;
     if (who === 'player') { 
@@ -107,8 +112,6 @@ async function moveCard(who, source, targetSquare, mode, faceDown) {
         targetZone.show(); // Unhide if hidden by setting card face-down - can add if visible condition later
     });
 
-    const faceUp = !faceDown;
-
     if (isComputer && faceUp) {
          
         targetZone.hide(); // Hide target zone so defense animation isn't shown
@@ -156,9 +159,10 @@ async function moveCard(who, source, targetSquare, mode, faceDown) {
     $(targetSquare).attr('data-card-name', cardName)
     $(targetSquare).attr('data-card-position', mode)
     $(targetSquare).attr('data-turn-moved', turnCount)
+    $(targetSquare).attr('data-turn-posChanged', turnCount)
 
     // Add card to global field var
-    window[who]['field'][cardType].push({'zone': zoneNum, 'cardName': cardName, 'cardType': cardType})
+    window[who]['field'][cardType].push({'zone': zoneNum, 'cardName': cardName, 'cardType': cardType, 'cardPosition': mode})
 }
 
 // Only affects element if 'speed' field was changed in .flip init, i.e. if was set to -1, or 1, so .flip status can be set with no animation
@@ -191,11 +195,7 @@ $(document).on('click', '#player-hand > .card', function() {
     activeCard = $(this); // Set new activeCard var
     $(this).addClass('active-card')
 
-    if (turn === 0) { // If player's turn then show all available squares where card can be summoned
-
-        showAvailableZones();
-
-    }
+    if (turn === 0) showAvailableZones(); // If player's turn then show all available squares where card can be summoned
 
 })
 
@@ -225,13 +225,18 @@ $(document).on('click', '.player-field-grid div.card-zone-square', function() {
 
     // Select card that was already placed, i.e. to change its position during main phase
     // Confirm athere's a card in the square and card wasn't placed this turn <-- ONLY APPLIES TO MONSTERS CHANGE THIS LATER (check that monster type is monster below and then check if turn count isn't the same as when monster was summoned)
-    if (!isSquareEmpty($(this)) && $(this).attr('data-turn-moved') != turnCount) {
+    if (!isSquareEmpty($(this)) && $(this).attr('data-turn-posChanged') != turnCount) {
 
         resetActiveCardClass()
         activeCard = $(this);
-        
         $(this).find('div.card-zone.main-zone').addClass('active-card') // Add fancy selected border
+
+        const cardPosition = $(this).attr('data-card-position')
+        
+        showAllPositionChanges() // Unhide position options from previous position menu
         positionOptions = $('#change-position-options')
+        positionOptions.find('.' + cardPosition).hide(); // Hide option of card's current position
+
         positionOptions.show()
         positionOptions.css('top', $(this).offset().top)
         positionOptions.css('left', $(this).offset().left)
@@ -248,25 +253,44 @@ function summonOptionSelected(position) {
     
     clearAvailableZones() // Do this before moving card since getAvailableSquaresElms() wouldn't return target zone then
 
-    if (position === 'def-down') {
-        faceDown = true;
-    } else if (position === 'atk' || position === 'def-up') {
-        faceDown = false;
-    }
-
-    if (position === 'def-up' || position === 'def-down') {
-        isDefense = true;
-        mode = 'defense'
-    } else if (position === 'atk') {
-        isDefense = false;
-        mode = 'attack'
-    }
-
-    moveCard('player', activeCard, selectedSquare, mode, faceDown) // source, target
+    moveCard('player', activeCard, selectedSquare, position) // source, target
     removeMonsterFromHandVar('player', activeCard.attr('data-card-name'))
 
     activeCard = null;
     selectedSquare = null;
+
+}
+
+function changePositionSelected(position) {
+
+    resetActiveCardClass(); // Remove css from active card
+    $('#change-position-options').hide(); // Remove summon options button menu
+
+    const curPos = activeCard.attr('data-card-position')
+
+    activeCard.find('div.card-zone.main-zone').css('background-color', 'transparent'); // Hide lime background
+
+    if (position === 'attack') {
+        activeCard.find('div.card-zone.main-zone').flip(false);
+        activeCard.find('div.card-zone.main-zone').transition({ 
+            rotate: '0'
+        }, 500, 'ease');
+
+    } else if (position === 'defense-up') {
+
+        activeCard.find('div.card-zone.main-zone').flip(false);
+        activeCard.find('div.card-zone.main-zone').transition({ 
+            rotate: '90deg'
+        }, 500, 'ease');
+
+    } else if (position === 'defense-down') {
+        activeCard.find('div.card-zone.main-zone').flip(true);
+        activeCard.find('div.card-zone.main-zone').transition({ 
+            rotate: '90deg'
+        }, 500, 'ease');
+    }
+
+    activeCard.attr('data-turn-posChanged', turnCount)
 
 }
 
