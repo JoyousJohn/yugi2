@@ -154,6 +154,7 @@ function prepareGame() {
     $('#homescreen').hide(); 
     $('#summon-options').hide();
     $('#change-position-options').hide();
+    $('#attack-menu').hide();
     $('#viewport').show();
     player = { 
         'hand': { 'monsters': [], 'spells': [], 'traps': []},

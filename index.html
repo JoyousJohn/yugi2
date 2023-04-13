@@ -63,7 +63,7 @@
     
     <div id="viewport" style="display: none;">
 
-        <div id="opponent-lp">5000</div>
+        <div id="opponent-lp">5000 LP</div>
 
         <div id="turn-popup" style="display: none;"><span></span></div>
 
@@ -79,6 +79,10 @@
             <button class="position-option attack" onclick="changePositionSelected('attack')">Face-up attack</button>
             <button class="position-option defense-up" onclick="changePositionSelected('defense-up')">Face-up defense</button>
             <button class="position-option defense-down" onclick="changePositionSelected('defense-down')">Face-down defense</button>
+        </div>
+
+        <div id="attack-menu">
+            <button class="request-attack-btn" onclick="requestAttack()">ATTACK</button>
         </div>
 
         <div id="info-panel">
@@ -112,7 +116,7 @@
 
         <div id="mat-wrapper" style="position: relative;"> <!-- So player-lp can be attatched to bottom left -->
 
-            <div id="player-lp">5000</div>
+            <div id="player-lp">5000 LP</div>
 
             <div id="mat">
 

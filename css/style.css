@@ -14,7 +14,7 @@
     overflow-y: hidden;
 }
 
-#summon-options, #change-position-options {
+#summon-options, #change-position-options, #attack-menu {
     display: flex; 
     flex-direction: column;
     position: fixed; 

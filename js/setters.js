@@ -66,10 +66,15 @@ function hidePositionChangeOptionsIfVisible() {
     if (isPositionChangeOptionsVisible()) $('#change-position-options').hide();
 }
 
+function hideAtkMenuIfVisible() {
+    if (isAtkMenuVisible()) $('#attack-menu').hide();
+}
+
+// Show any change position options that were hidden when showing valid position changes
 function showAllPositionChanges() {
     $('#change-position-options button').each(function() {
         console.log($(this))
-        if ($(this).is(':hidden')) $(this).show(); // Show any change position options that were hidden when showing valid position changes
+        if ($(this).is(':hidden')) $(this).show(); 
     })
 }
 
@@ -78,7 +83,12 @@ function resetActiveCardClass() {
     $('.active-card').removeClass('active-card') 
 }
 
-
+// Only affects element if 'speed' field was changed in .flip init, i.e. if was set to -1, or 1, so .flip status can be set with no animation
+async function updateFlipSpeed(flipElm, newSpeed) {
+    flipElm = $(flipElm)
+    flipElm.data('flip-model').setting.speed = 500; // Not sure if affects anything
+    flipElm.find('div.front, div.back').css('transition', 'all ' + newSpeed + 'ms ease-out 0s') // Change transition speed
+}
 
 
 
