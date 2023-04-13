@@ -8,6 +8,15 @@
 
 #game-phase {
     font-family: A-Space Demo;
+    margin: 0;
+}
+
+#turn-info {
+    margin: 0;
+}
+
+#preview-card-img {
+    width: 100%;
 }
 
 #feed {
