@@ -18,6 +18,11 @@
     width: 100%;
 }
 
+#preview-card-stats {
+    margin: 0; /* Remove margin from h5 (might change?) elm */
+    text-align: center;
+}
+
 #feed {
     font: 16rem Arial;
 }
