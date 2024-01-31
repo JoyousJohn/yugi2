@@ -4,7 +4,7 @@
     --card-aspect-ratio: calc(var(--card-height) / var(--card-width))
 }
 
-/* {
+/* * {
     box-sizing: border-box;
 }*/
 
@@ -91,7 +91,8 @@
 }
 
 .active-card {
-    border: 5px solid blue;
+    box-shadow: 0 0 10px 5px #00f; 
+    z-index: 2 !important; /* other cards in hand overlap shadow otherwise */
 }
 
 button {
